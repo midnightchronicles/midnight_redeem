@@ -1,3 +1,12 @@
+this is a basic redeem system utilising input dialog which i find useful for things like giving refunds or one of quick giveaways
+
+* limit the uses of how many times the code can be used only allowing players to use the code once making it fair on others
+* set the days of how long the code will be available in real time via sql
+* you can choose item and amount or you can choose how much cash and or you can do both if your feeling generous (planned to do option for cash or card soon)
+
+with the bridge that is utilised within this script gives alot of options for different
+input dialogs, notifications, frameworks, inventorys making it easy to customise to whatever resource you use without being limited
+
 # dependancys
 
 * https://github.com/overextended/ox_lib/releases (if using ox_lib menu)
