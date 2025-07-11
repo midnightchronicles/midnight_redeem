@@ -42,7 +42,7 @@ local function versionCheck(resource, repository, paid)
                                 print("[^5Midnight_Redeem^0] [^4is newer than expected^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please downgrade to latest release for^0] [^3"..resource.."^0] [^1through the cfx portal]")
                                 break
                             else
-                                print("[^5Midnight_Redeem^0] [^4is newer than expected^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please downgrade to latest release here: https://github.com/midnight_run/releases/latest^0]")
+                                print("[^5Midnight_Redeem^0] [^4is newer than expected^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please downgrade to latest release here: https://github.com/midnightchronicles/midnight_redeem^0]")
                                 break
                             end
                         end
@@ -50,7 +50,7 @@ local function versionCheck(resource, repository, paid)
                     if current ~= minimum then
                         if current < minimum then
                             if not paid then
-                                print("[^5Midnight_Redeem^0] [^4is outdated^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please update^0] [^3"..resource.."^0] [^1here:^0]\n[^5https://github.com/midnight_run/releases/latest^0]")
+                                print("[^5Midnight_Redeem^0] [^4is outdated^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please update^0] [^3"..resource.."^0] [^1here:^0]\n[^5https://github.com/midnightchronicles/midnight_redeem^0]")
                                 break
                             else
                                 print("[^5Midnight_Redeem^0] [^4is outdated^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please update^0] [^3"..resource.."^0] [^1through the cfx portal^0]")
