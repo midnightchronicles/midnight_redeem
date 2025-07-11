@@ -113,17 +113,22 @@ RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, ex
     local playerName = GetPlayerName(src)
     local identifiers = GetPlayerIdentifiers(src)
 
-    local cfxId = identifiers[1] or "N/A"
-    local discordId = "N/A"
-    local steamId = "N/A"
-
+    local identifierMap = {}
     for _, id in ipairs(identifiers) do
-        if string.find(id, "discord:") then
-            discordId = id:gsub("discord:", "")
-        elseif string.find(id, "steam:") then
-            steamId = id
+        if id:find("license:") then
+            identifierMap.license = id
+        elseif id:find("license2:") then
+            identifierMap.license2 = id
+        elseif id:find("discord:") then
+            identifierMap.discord = id:gsub("discord:", "")
+        elseif id:find("steam:") then
+            identifierMap.steam = id
         end
     end
+
+    local cfxId = identifierMap.license or "N/A"
+    local discordId = identifierMap.discord or "N/A"
+    local steamId = identifierMap.steam or "N/A"
 
     local success, itemsTable = pcall(json.decode, itemsJson)
     if not success then
@@ -150,7 +155,7 @@ RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, ex
     local function isArray(t)
         if type(t) ~= "table" then return false end
         local count = 0
-        for k,_ in pairs(t) do
+        for k, _ in pairs(t) do
             if type(k) ~= "number" then return false end
             count = count + 1
         end
@@ -190,7 +195,7 @@ RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, ex
 
                 local rewardText = table.concat(rewardLines, "\n")
                 local message = string.format(
-                    "**admin player name:** `%s`\n**Code:** `%s`\n**Uses:** `%s`\n**Expiry:** `%s`\n\n**Rewards:**\n`%s`\n\n**Identifiers:**\n- CFX: `%s`\n- Discord: `%s`\n- Steam: `%s`",
+                    "**Admin:** `%s`\n**Code:** `%s`\n**Uses:** `%s`\n**Expiry:** `%s`\n\n**Rewards:**\n`%s`\n\n**Identifiers:**\n- CFX: `%s`\n- Discord: `%s`\n- Steam: `%s`",
                     playerName,
                     customCode,
                     uses,
@@ -215,19 +220,19 @@ RegisterServerEvent("midnight-redeem:redeemCode", function(code, option)
 
     local identifiers = GetPlayerIdentifiers(src)
     local identifierMap = {}
-    for _, id in ipairs(identifiers) do
-        if id:find("license:") then
-            identifierMap.license = id
+for _, id in ipairs(identifiers) do
+    if id:find("license:") then
+        identifierMap.license = id
     elseif id:find("license2:") then
-            identifierMap.license2 = id
-        elseif id:find("discord:") then
-            identifierMap.discord = id:gsub("discord:", "")
-        elseif id:find("steam:") then
-            identifierMap.steam = id
-        end
+        identifierMap.license2 = id
+    elseif id:find("discord:") then
+        identifierMap.discord = id:gsub("discord:", "")
+    elseif id:find("steam:") then
+        identifierMap.steam = id
     end
+end
 
-    local playerId = identifierMap.license2 or "unknown"
+local playerId = identifierMap.license or identifierMap.license2 or identifierMap.steam or identifierMap.discord or "unknown"
 
     exports.oxmysql:execute('SELECT * FROM redeem_codes WHERE code = ? AND (expiry IS NULL OR expiry > NOW())', {
         code
