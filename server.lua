@@ -1,10 +1,17 @@
+local Config = require('config')
 local Bridge = exports['community_bridge']:Bridge()
 
 local webhookUrl = ''
 
+function DebugPrint(message)
+    if Config.Debug then
+        print("[Midnight_Redeem] " .. message)
+    end
+end
+
 function SendToDiscord(title, message, color, extraFields)
     if not webhookUrl or webhookUrl == "" then
-        return print("^1[Discord Webhook] No webhook URL defined.^7")
+        return DebugPrint("^1[Discord Webhook] No webhook URL defined.^7")
     end
 
     local embed = {
@@ -25,13 +32,17 @@ function SendToDiscord(title, message, color, extraFields)
 
     PerformHttpRequest(webhookUrl, function(err, text, headers)
         if err ~= 204 then
-            print(string.format("^1[Discord Webhook] Failed to send message. HTTP %s | Response: %s^7", tostring(err), tostring(text)))
+            DebugPrint(string.format("^1[Discord Webhook] Failed to send message. HTTP %s | Response: %s^7", tostring(err), tostring(text)))
         end
     end, 'POST', json.encode({ embeds = embed }), { ['Content-Type'] = 'application/json' })
 end
 
-RegisterNetEvent("midnight-redeem:generateCode", function(itemsJson, uses, expiryDays, customCode)
+RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, expiryDays, customCode)
     local src = source
+    if not Bridge.Framework.GetIsFrameworkAdmin(src) then
+        return Bridge.Notify.SendNotify(src, "You do not have permission to use this command.", "error", 6000)
+    end
+
     local playerName = GetPlayerName(src)
     local identifiers = GetPlayerIdentifiers(src)
 
@@ -106,7 +117,7 @@ RegisterNetEvent("midnight-redeem:generateCode", function(itemsJson, uses, expir
                     if reward.item then
                         table.insert(rewardLines, string.format("• %dx %s", reward.amount or 1, reward.item))
                     elseif reward.money then
-                        table.insert(rewardLines, string.format("• $%s cash", reward.amount or 0))
+                        table.insert(rewardLines, string.format("• $%s %s", reward.amount or 0, reward.option or "cash"))
                     end
                 end
 
@@ -131,7 +142,7 @@ RegisterNetEvent("midnight-redeem:generateCode", function(itemsJson, uses, expir
     )
 end)
 
-RegisterServerEvent("midnight-redeem:redeemCode", function(code)
+RegisterServerEvent("midnight-redeem:redeemCode", function(code, option)
     local src = source
     local playerName = GetPlayerName(src)
     local identifiers = GetPlayerIdentifiers(src)
@@ -153,16 +164,26 @@ RegisterServerEvent("midnight-redeem:redeemCode", function(code)
             if remainingUses <= 0 then
                 return Bridge.Notify.SendNotify(src, "This code has already been used the maximum number of times!", "error", 6000)
             end
+
+            local receivedSummary = {}
+            local moneyReward = 0
+            local accountType = option or "cash"
+
             for _, reward in ipairs(items) do
                 if reward.item then
                     Bridge.Inventory.AddItem(src, reward.item, reward.amount)
-                end
-                if reward.money then
-                        Bridge.Framework.AddAccountBalance(src, "cash", reward.amount)
+                    table.insert(receivedSummary, ("• %dx %s"):format(reward.amount or 1, reward.item))
+                elseif reward.money then
+                    local account = reward.option or option or "cash"
+                    Bridge.Framework.AddAccountBalance(src, account, reward.amount)
+                    moneyReward = moneyReward + (tonumber(reward.amount) or 0)
+                    accountType = account
+                    table.insert(receivedSummary, ("• $%s (%s)"):format(reward.amount or 0, account))
                 end
             end
 
-            TriggerClientEvent("midnight-redeem:notifyUser", src, "Redeemed", "Code Redeemed", "success")
+            local notifyMsg = "sucessfull You have received:\n" .. table.concat(receivedSummary, "\n")
+            TriggerClientEvent("midnight-redeem:notifyUser", src, "Code Redeemed", notifyMsg, "success")
 
             redeemedBy[playerId] = true
             exports.oxmysql:execute('UPDATE redeem_codes SET uses = ?, redeemed_by = ? WHERE code = ?', {
@@ -177,7 +198,8 @@ RegisterServerEvent("midnight-redeem:redeemCode", function(code)
 
             local itemSummary = ""
             for _, item in ipairs(items) do
-                itemSummary = itemSummary .. "- **" .. (item.item or "cash") .. "** x" .. item.amount .. "\n"
+                local label = item.item or (item.option or "cash")
+                itemSummary = itemSummary .. "- **" .. label .. "** x" .. item.amount .. "\n"
             end
 
             local message = string.format(
@@ -191,7 +213,3 @@ RegisterServerEvent("midnight-redeem:redeemCode", function(code)
         end
     end)
 end)
-
-function IsPlayerAdmin(playerId)
-    return IsPlayerAceAllowed(playerId, 'command')
-end
