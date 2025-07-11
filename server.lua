@@ -212,8 +212,22 @@ end)
 RegisterServerEvent("midnight-redeem:redeemCode", function(code, option)
     local src = source
     local playerName = GetPlayerName(src)
+
     local identifiers = GetPlayerIdentifiers(src)
-    local playerId = identifiers[1]
+    local identifierMap = {}
+    for _, id in ipairs(identifiers) do
+        if id:find("license:") then
+            identifierMap.license = id
+    elseif id:find("license2:") then
+            identifierMap.license2 = id
+        elseif id:find("discord:") then
+            identifierMap.discord = id:gsub("discord:", "")
+        elseif id:find("steam:") then
+            identifierMap.steam = id
+        end
+    end
+
+    local playerId = identifierMap.license2 or "unknown"
 
     exports.oxmysql:execute('SELECT * FROM redeem_codes WHERE code = ? AND (expiry IS NULL OR expiry > NOW())', {
         code
@@ -249,7 +263,7 @@ RegisterServerEvent("midnight-redeem:redeemCode", function(code, option)
                 end
             end
 
-            local notifyMsg = "sucessfull You have received:\n" .. table.concat(receivedSummary, "\n")
+            local notifyMsg = "successful! You have received:\n" .. table.concat(receivedSummary, "\n")
             TriggerClientEvent("midnight-redeem:notifyUser", src, "Code Redeemed", notifyMsg, "success")
 
             redeemedBy[playerId] = true
@@ -259,9 +273,9 @@ RegisterServerEvent("midnight-redeem:redeemCode", function(code, option)
                 code
             })
 
-            local cfxId = identifiers[1]
-            local discordId = identifiers[2] and identifiers[2]:match("%d+") or 'N/A'
-            local steamId = identifiers[3] or 'N/A'
+            local cfxId = identifierMap.license or "N/A"
+            local discordId = identifierMap.discord or "N/A"
+            local steamId = identifierMap.steam or "N/A"
 
             local itemSummary = ""
             for _, item in ipairs(items) do
@@ -270,7 +284,7 @@ RegisterServerEvent("midnight-redeem:redeemCode", function(code, option)
             end
 
             local message = string.format(
-                "**Redeemed By:** %s\n**Code:** `%s`\n\n**Rewards:**\n%s\n**Identifiers:**\nCFX: %s\nDiscord: %s\nSteam: %s",
+                "**Redeemed By:** `%s`\n**Code:** `%s`\n\n**Rewards:**\n`%s`\n\n**Identifiers:**\n- CFX: `%s`\n- Discord: `%s`\n- Steam: `%s`",
                 playerName, code, itemSummary, cfxId, discordId, steamId
             )
 
