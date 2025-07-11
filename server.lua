@@ -28,7 +28,7 @@ local function versionCheck(resource, repository, paid)
             if not latestVersion then
                 return
             elseif latestVersion == currentVersion then
-                print("[^5Midnight_Redeem^0] [^2Is up to date^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]")
+                print("[^5midnight_redeem^0] [^2Is up to date^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]")
             else
                 local cv = { string.strsplit('.', currentVersion) }
                 local lv = { string.strsplit('.', latestVersion) }
@@ -39,10 +39,10 @@ local function versionCheck(resource, repository, paid)
                     if i == maxParts then
                         if (#cv > i and current == minimum and tonumber(cv[i+1] or 0) > tonumber(lv[i+1] or 0)) or (#cv >= i and current > minimum) then
                             if paid then
-                                print("[^5Midnight_Redeem^0] [^4is newer than expected^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please downgrade to latest release for^0] [^3"..resource.."^0] [^1through the cfx portal]")
+                                print("[^5midnight_redeem^0] [^4is newer than expected^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please downgrade to latest release for^0] [^3"..resource.."^0] [^1through the cfx portal]")
                                 break
                             else
-                                print("[^5Midnight_Redeem^0] [^4is newer than expected^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please downgrade to latest release here: https://github.com/midnightchronicles/midnight_redeem^0]")
+                                print("[^5midnight_redeem^0] [^4is newer than expected^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please downgrade to latest release here: https://github.com/midnightchronicles/midnight_redeem^0]")
                                 break
                             end
                         end
