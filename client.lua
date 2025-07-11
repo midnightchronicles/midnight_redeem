@@ -15,7 +15,7 @@ RegisterNetEvent("midnight-redeem:notifyUser", function(title, description, type
     NotificationUser(title, description, type)
 end)
 
-RegisterCommand("genredeem", function()
+RegisterCommand(Config.GenerateCommand, function()
     local rewards = {}
 
     while true do
@@ -90,7 +90,7 @@ RegisterCommand("genredeem", function()
     TriggerServerEvent("midnight-redeem:generateCode", json.encode(rewards), uses, expiryDays, customCode)
 end, false)
 
-RegisterCommand("redeemcode", function()
+RegisterCommand(Config.RedeemCommand, function()
     local input = Bridge.Input.Open('Redeem Code', {
         { type = 'input', label = 'Enter Redeem Code', placeholder = 'e.g. waterbonus2025', required = true },
         {
