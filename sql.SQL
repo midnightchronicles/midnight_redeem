@@ -1,4 +1,4 @@
-CREATE TABLE `redeem_codes` (
+CREATE TABLE `midnight_codes` (
     `code` VARCHAR(60) NOT NULL COLLATE 'utf8mb3_general_ci',
     `total_item_count` INT NOT NULL,
     `items` JSON NOT NULL,

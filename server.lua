@@ -172,7 +172,7 @@ RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, ex
     end
 
     exports.oxmysql:execute(
-        'INSERT INTO redeem_codes (code, total_item_count, items, uses, created_by, expiry, redeemed_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        'INSERT INTO midnight_codes (code, total_item_count, items, uses, created_by, expiry, redeemed_by) VALUES (?, ?, ?, ?, ?, ?, ?)',
         { customCode, totalItemCount, itemsJson, uses, playerName, expiryDate, json.encode({}) },
         function(rowsChanged)
             local affected = 0
@@ -234,7 +234,7 @@ end
 
 local playerId = identifierMap.license or identifierMap.license2 or identifierMap.steam or identifierMap.discord or "unknown"
 
-    exports.oxmysql:execute('SELECT * FROM redeem_codes WHERE code = ? AND (expiry IS NULL OR expiry > NOW())', {
+    exports.oxmysql:execute('SELECT * FROM midnight_codes WHERE code = ? AND (expiry IS NULL OR expiry > NOW())', {
         code
     }, function(result)
         if result[1] then
@@ -272,7 +272,7 @@ local playerId = identifierMap.license or identifierMap.license2 or identifierMa
             TriggerClientEvent("midnight-redeem:notifyUser", src, "Code Redeemed", notifyMsg, "success")
 
             redeemedBy[playerId] = true
-            exports.oxmysql:execute('UPDATE redeem_codes SET uses = ?, redeemed_by = ? WHERE code = ?', {
+            exports.oxmysql:execute('UPDATE midnight_codes SET uses = ?, redeemed_by = ? WHERE code = ?', {
                 remainingUses - 1,
                 json.encode(redeemedBy),
                 code
