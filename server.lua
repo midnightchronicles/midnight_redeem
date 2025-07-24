@@ -190,17 +190,23 @@ RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, ex
             if affected > 0 then
                 Bridge.Notify.SendNotify(src, "Redeem code created successfully!", "success", 6000)
                 local rewardLines = {}
-                for _, reward in ipairs(rewards) do
-                    if reward.item then
-                        table.insert(rewardLines, string.format("• %dx %s", reward.amount or 1, reward.item))
-                    elseif reward.money then
-                        table.insert(rewardLines, string.format("• $%s %s", reward.amount or 0, reward.option or "cash"))
-                    end
+            for _, reward in ipairs(rewards) do
+                if reward.item then
+                    table.insert(rewardLines, string.format("• %dx %s", reward.amount or 1, reward.item))
+                elseif reward.money then
+                    local moneyAmount = tonumber(reward.amount) or 0
+                    local moneyType = reward.option or option or "cash"
+                    table.insert(rewardLines, string.format("• $%s (%s)", moneyAmount, moneyType))
+                elseif reward.vehicle then
+                    local model = reward.model or "Unknown"
+                    table.insert(rewardLines, string.format("• Vehicle: %s", model))
                 end
+            end
 
                 local rewardText = table.concat(rewardLines, "\n")
+
                 local message = string.format(
-                    "**Admin:** `%s`\n**Code:** `%s`\n**Uses:** `%s`\n**Expiry:** `%s`\n\n**Rewards:**\n`%s`\n\n**Identifiers:**\n- CFX: `%s`\n- Discord: `%s`\n- Steam: `%s`",
+                    "**Admin:** `%s`\n**Code:** `%s`\n**Uses:** `%s`\n**Expiry:** `%s`\n\n**Rewards:**\n%s\n\n**Identifiers:**\n- CFX: `%s`\n- Discord: `%s`\n- Steam: `%s`",
                     playerName,
                     customCode,
                     uses,
