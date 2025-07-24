@@ -1,5 +1,10 @@
 local Config = require('config')
 local Bridge = exports['community_bridge']:Bridge()
+if Config.Framework == "qb" and QBCore == nil then
+    QBCore = exports['qb-core']:GetCoreObject()
+elseif Config.Framework == "esx" and ESX == nil then
+    TriggerEvent('esx:getSharedObject', function(obj) ESX = obj end)
+end
 
 local webhookUrl = ''
 
@@ -50,10 +55,10 @@ local function versionCheck(resource, repository, paid)
                     if current ~= minimum then
                         if current < minimum then
                             if not paid then
-                                print("[^5Midnight_Redeem^0] [^4is outdated^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please update^0] [^3"..resource.."^0] [^1here:^0]\n[^5https://github.com/midnightchronicles/midnight_redeem^0]")
+                                print("[^5midnight_redeem^0] [^4is outdated^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please update^0] [^3"..resource.."^0] [^1here:^0]\n[^5https://github.com/midnightchronicles/midnight_redeem^0]")
                                 break
                             else
-                                print("[^5Midnight_Redeem^0] [^4is outdated^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please update^0] [^3"..resource.."^0] [^1through the cfx portal^0]")
+                                print("[^5midnight_redeem^0] [^4is outdated^0] [^4Your version^0] [^3"..currentVersion.."^0] [^4Latest Version^0] [^3"..latestVersion.."^0]\n[^1Please update^0] [^3"..resource.."^0] [^1through the cfx portal^0]")
                                 break
                             end
                         end
@@ -220,19 +225,39 @@ RegisterServerEvent("midnight-redeem:redeemCode", function(code, option)
 
     local identifiers = GetPlayerIdentifiers(src)
     local identifierMap = {}
-for _, id in ipairs(identifiers) do
-    if id:find("license:") then
-        identifierMap.license = id
-    elseif id:find("license2:") then
-        identifierMap.license2 = id
-    elseif id:find("discord:") then
-        identifierMap.discord = id:gsub("discord:", "")
-    elseif id:find("steam:") then
-        identifierMap.steam = id
+    for _, id in ipairs(identifiers) do
+        if id:find("license:") then
+            identifierMap.license = id
+        elseif id:find("license2:") then
+            identifierMap.license2 = id
+        elseif id:find("discord:") then
+            identifierMap.discord = id:gsub("discord:", "")
+        elseif id:find("steam:") then
+            identifierMap.steam = id
+        end
     end
-end
 
-local playerId = identifierMap.license or identifierMap.license2 or identifierMap.steam or identifierMap.discord or "unknown"
+    local identifier = identifierMap.license or identifierMap.license2 or identifierMap.steam or identifierMap.discord or "unknown"
+    local playerId = identifier
+
+    function Bridge.Framework.GetPlayerData(source)
+        if Config.Framework == "esx" then
+            local xPlayer = ESX.GetPlayerFromId(source)
+            if xPlayer then
+                return {
+                    identifier = xPlayer.identifier
+                }
+            end
+        elseif Config.Framework == "qb" then
+            local Player = QBCore.Functions.GetPlayer(source)
+            if Player then
+                return {
+                    citizenid = Player.PlayerData.citizenid
+                }
+            end
+        end
+        return nil
+    end
 
     exports.oxmysql:execute('SELECT * FROM midnight_codes WHERE code = ? AND (expiry IS NULL OR expiry > NOW())', {
         code
@@ -265,6 +290,32 @@ local playerId = identifierMap.license or identifierMap.license2 or identifierMa
                     moneyReward = moneyReward + (tonumber(reward.amount) or 0)
                     accountType = account
                     table.insert(receivedSummary, ("• $%s (%s)"):format(reward.amount or 0, account))
+                elseif reward.vehicle then
+                    local model = reward.model
+                    if model then
+                        local plate = string.upper(string.sub(GetPlayerName(src), 1, 3)) .. math.random(1000, 9999)
+                        local props = {
+                            model = model,
+                            plate = plate
+                        }
+
+                        local state = 1
+                        local garage = "pillbox"
+
+                        local playerData = Bridge.Framework.GetPlayerData(src)
+
+                        if Config.Framework == "esx" then
+                            exports.oxmysql:execute('INSERT INTO `owned_vehicles` (owner, plate, vehicle, stored) VALUES (?, ?, ?, ?)', {
+                                identifier, plate, json.encode(props), state
+                            })
+                        elseif Config.Framework == "qb" then
+                            exports.oxmysql:execute('INSERT INTO `player_vehicles` (license, citizenid, vehicle, hash, mods, plate, state, garage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', {
+                                identifier, playerData and playerData.citizenid or "unknown", model, GetHashKey(model), json.encode(props), plate, state, garage
+                            })
+                        end
+
+                        table.insert(receivedSummary, ("• Vehicle: %s (Plate: %s)"):format(model, plate))
+                    end
                 end
             end
 
@@ -284,8 +335,8 @@ local playerId = identifierMap.license or identifierMap.license2 or identifierMa
 
             local itemSummary = ""
             for _, item in ipairs(items) do
-                local label = item.item or (item.option or "cash")
-                itemSummary = itemSummary .. "- **" .. label .. "** x" .. item.amount .. "\n"
+                local label = item.item or item.model or (item.option or "cash")
+                itemSummary = itemSummary .. "- **" .. label .. "** x" .. (item.amount or 1) .. "\n"
             end
 
             local message = string.format(

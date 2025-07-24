@@ -20,7 +20,7 @@ RegisterCommand(Config.GenerateCommand, function()
 
     while true do
         local itemInput = Bridge.Input.Open('Add Reward Item', {
-            { type = 'input', label = 'Item Name', placeholder = 'e.g. water', required = true },
+            { type = 'input', label = 'Item Name', placeholder = 'press cancel if no item', required = true },
             { type = 'number', label = 'Item Amount', placeholder = 'e.g. 1', required = true }
         })
 
@@ -62,31 +62,36 @@ RegisterCommand(Config.GenerateCommand, function()
     end
 
     local finalInput = Bridge.Input.Open('Finalize Redeem Code', {
+        { type = 'input', label = 'Vehicle Name', placeholder = 'e.g. asbo', required = false },
         { type = 'number', label = 'Money Amount', placeholder = 'e.g. 500', required = false },
         { type = 'number', label = 'Uses', placeholder = 'e.g. 1', required = true },
         { type = 'number', label = 'Expiry (Days)', placeholder = 'e.g. 1', required = true },
         { type = 'input', label = 'Custom Code', placeholder = 'e.g. foodpack123', required = true }
     })
-
+    
     if not finalInput then
         DebugPrint("^1[DEBUG] No input submitted for finalization^7")
         return
     end
-
-    local moneyAmount = tonumber(finalInput[1])
-    local uses = tonumber(finalInput[2])
-    local expiryDays = tonumber(finalInput[3])
-    local customCode = finalInput[4]
-
+    
+    local vehicleName = finalInput[1] ~= "" and finalInput[1] or nil
+    local moneyAmount = tonumber(finalInput[2])
+    local uses = tonumber(finalInput[3])
+    local expiryDays = tonumber(finalInput[4])
+    local customCode = finalInput[5]
+    
     if moneyAmount and moneyAmount > 0 then
         table.insert(rewards, { money = true, amount = moneyAmount })
     end
-
-    if #rewards == 0 then
-        return NotificationUser(nil, 'You must provide at least an item or a money amount.', 'error')
+    
+    if vehicleName then
+        table.insert(rewards, { vehicle = true, model = vehicleName })
     end
-
-    DebugPrint("CLIENT: sending generateCode –", customCode)
+    
+    if #rewards == 0 then
+        return NotificationUser(nil, 'You must provide at least an item, money, or vehicle.', 'error')
+    end
+    
     TriggerServerEvent("midnight-redeem:generateCode", json.encode(rewards), uses, expiryDays, customCode)
 end, false)
 
