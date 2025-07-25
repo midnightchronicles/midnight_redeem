@@ -38,3 +38,36 @@ ensure your_core
 ensure your_inventory
 ensure community_bridge
 ensure midnight_redeem
+
+# exports
+
+--server
+exports['midnight_redeem']:GenerateRedeemCode()
+
+examples
+
+exports['midnight_redeem']:GenerateRedeemCode(
+    source,
+    '[{"item":"bread","amount":5},{"money":true,"amount":1000,"option":"cash"},{"vehicle":true,"model":"adder"}]',
+    "3",                -- Max uses
+    "7",                -- Expiry in days
+    "GIFT2025"          -- Custom code
+)
+
+or
+
+local playerId = source
+local code = userProvidedCode
+local uses = tostring(userProvidedUses)
+local expiry = tostring(userProvidedDays)
+local rewardsJson = json.encode(userProvidedRewards)
+
+exports['midnight_redeem']:GenerateRedeemCode(
+    playerId,
+    rewardsJson,
+    uses,
+    expiry,
+    code
+)
+
+these are just examples please do not use there is no support regarding the export use only do this if you know what your doing
