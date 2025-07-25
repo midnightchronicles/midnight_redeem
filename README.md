@@ -31,7 +31,7 @@ Easily customizable with support for various frameworks, inventory systems, noti
 
 ## 🔧 Dependencies
 
-community_bridge - https://github.com/The-Order-Of-The-Sacred-Framework/community_bridge
+[Community Bridge](https://github.com/The-Order-Of-The-Sacred-Framework/community_bridge)
 
 Ensure these resources are started **before** `midnight_redeem`:
 ensure ox_lib
