@@ -43,10 +43,10 @@ ensure midnight_redeem
 
 ## Player Command
 /redeemcode (changeable in config)
-Prompts the player to input their redeem code. (changeable in config)
+Prompts the player to input their redeem code.
 
 ## Admin Command
-/genredeem
+/genredeem (changeable in config)
 Opens an input dialog for an admin to generate a new redeem code with reward configuration.
 
 
