@@ -33,7 +33,8 @@ Easily customizable with support for various frameworks, inventory systems, noti
 
 [Community Bridge](https://github.com/The-Order-Of-The-Sacred-Framework/community_bridge)
 
-Ensure these resources are started **before** `midnight_redeem`:                                                                                                                                                    
+Ensure these resources are started **before** `midnight_redeem`:   
+                                                                                                                                                                                                                                                                                                     
 ensure ox_lib                                                                                                                                                    
 ensure your_core                                                                                                                                                    
 ensure your_inventory                                                                                                                                                    
