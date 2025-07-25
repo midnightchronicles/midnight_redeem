@@ -75,19 +75,19 @@ exports['midnight_redeem']:GenerateRedeemCode(
 )
 
 ## Dynamic From User Input
-local playerId = source
-local code = userProvidedCode
-local uses = tostring(userProvidedUses)
-local expiry = tostring(userProvidedDays)
-local rewardsJson = json.encode(userProvidedRewards)
+local playerId = source                                                                                                                                                    
+local code = userProvidedCode                                                                                                                                                    
+local uses = tostring(userProvidedUses)                                                                                                                                                    
+local expiry = tostring(userProvidedDays)                                                                                                                                                    
+local rewardsJson = json.encode(userProvidedRewards)                                                                                                                                                    
 
-exports['midnight_redeem']:GenerateRedeemCode(
-    source,         -- player ID
-    rewardsJson,    -- reward structure (items, cash, etc.)
-    uses,           -- max uses
-    expiry,         -- expiry in days
-    code            -- redeem code
-)
+exports['midnight_redeem']:GenerateRedeemCode(                                                                                                                                                    
+    source,         -- player ID                                                                                                                                                    
+    rewardsJson,    -- reward structure (items, cash, etc.)                                                                                                                                                    
+    uses,           -- max uses                                                                                                                                                    
+    expiry,         -- expiry in days                                                                                                                                                    
+    code            -- redeem code                                                                                                                                                    
+)                                                                                                                                                    
 
 ## 
 🚀 Happy Redeeming!
