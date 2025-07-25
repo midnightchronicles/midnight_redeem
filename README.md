@@ -42,11 +42,11 @@ ensure community_bridge
 ensure midnight_redeem                                                                                                                                                    
 
 ## Player Command
-/redeemcode (changeable in config)
+/redeemcode (changeable in config)                                                                                                                                                    
 Prompts the player to input their redeem code.
 
 ## Admin Command
-/genredeem (changeable in config)
+/genredeem (changeable in config)                                                                                                                                                    
 Opens an input dialog for an admin to generate a new redeem code with reward configuration.
 
 
@@ -66,12 +66,12 @@ When creating a reward code, configure these fields:
 
 
 ## Basic Example
-exports['midnight_redeem']:GenerateRedeemCode(
-    source,
+exports['midnight_redeem']:GenerateRedeemCode(                                                                                                                                                    
+    source,                                                                                                                                                    
     '[{"item":"bread","amount":5},{"money":true,"amount":1000,"option":"cash"},{"vehicle":true,"model":"adder"}]',
-    "3",        -- Max uses
-    "7",        -- Expiry in days
-    "GIFT2025"  -- Custom code
+    "3",        -- Max uses                                                                                                                                                    
+    "7",        -- Expiry in days                                                                                                                                                    
+    "GIFT2025"  -- Custom code                                                                                                                                                    
 )
 
 ## Dynamic From User Input
