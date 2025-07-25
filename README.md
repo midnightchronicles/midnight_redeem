@@ -42,8 +42,8 @@ ensure community_bridge
 ensure midnight_redeem                                                                                                                                                    
 
 ## Player Command
-/redeemcode
-Prompts the player to input their redeem code.
+/redeemcode (changeable in config)
+Prompts the player to input their redeem code. (changeable in config)
 
 ## Admin Command
 /genredeem
