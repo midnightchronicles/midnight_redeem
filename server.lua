@@ -110,9 +110,6 @@ function SendToDiscord(title, message, color, extraFields)
 end
 
 function GenerateRedeemCode(source, itemsJson, uses, expiryDays, customCode)
-    if source ~= 0 and source ~= -1 and not Bridge.Framework.GetIsFrameworkAdmin(source) then
-        return Bridge.Notify.SendNotify(source, "You do not have permission to use this command.", "error", 6000)
-    end
 
     local playerName = GetPlayerName(source) or "Console"
     local identifiers = GetPlayerIdentifiers(source)
@@ -194,6 +191,9 @@ function GenerateRedeemCode(source, itemsJson, uses, expiryDays, customCode)
 end
 
 RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, expiryDays, customCode)
+        if source ~= 0 and source ~= -1 and not Bridge.Framework.GetIsFrameworkAdmin(source) then
+        return Bridge.Notify.SendNotify(source, "You do not have permission to use this command.", "error", 6000)
+    end
     GenerateRedeemCode(source, itemsJson, uses, expiryDays, customCode)
 end)
 
