@@ -111,4 +111,5 @@ go to zdicord/server/commands and paste the file into the folder
 make sure zdiscord is started after midnight_redeem
 restart server
 good to go :)
+/generateredeem
 ```

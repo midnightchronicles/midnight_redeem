@@ -1,5 +1,5 @@
 module.exports = {
-    name: "redeem",
+    name: "generateredeem",
     description: "Generate a redeem code for items, money, and vehicles.",
     role: "mod",
 
