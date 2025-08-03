@@ -71,7 +71,7 @@ end
 
 AddEventHandler('onResourceStart', function(resource)
     if resource == "midnight_redeem" then
-        versionCheck(resource,"midnightchronicles/midnight_redeem_version",false)
+        versionCheck(resource,"midnightchronicles/midnight_redeem",false)
     end
 end)
 
@@ -331,4 +331,15 @@ end)
 
 exports('GenerateRedeemCode', function(source, itemsJson, uses, expiryDays, customCode)
     GenerateRedeemCode(source, itemsJson, uses, expiryDays, customCode)
+end)
+
+RegisterServerEvent("zdiscord:generateRedeemCode", function(itemsJson, uses, expiryDays, customCode)
+    uses = tonumber(uses)
+    expiryDays = tonumber(expiryDays)
+    if itemsJson and uses and expiryDays and customCode then
+        exports["midnight_redeem"]:GenerateRedeemCode(source, itemsJson, uses, expiryDays, customCode)
+        print(("Generated redeem code with rewards %s, uses %s, expiry %s, code %s"):format(itemsJson, uses, expiryDays, customCode))
+    else
+        print("[zdiscord] Invalid arguments for GenerateRedeemCode.")
+    end
 end)
