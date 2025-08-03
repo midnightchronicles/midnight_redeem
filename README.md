@@ -106,7 +106,7 @@ exports['midnight_redeem']:GenerateRedeemCode(
 ## zdiscord integration
 
 ```
-go to 'zdiscord_command_file' and copy generateredeem.js file
+go to 'midnight_redeem/zdiscord_command_file' folder and copy generateredeem.js file
 go to zdicord/server/commands and paste the file into the folder
 make sure zdiscord is started after midnight_redeem
 restart server
