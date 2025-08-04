@@ -16,6 +16,7 @@ RegisterNetEvent("midnight-redeem:notifyUser", function(title, description, type
 end)
 
 RegisterCommand(Config.GenerateCommand, function()
+    TriggerServerEvent('Midnight_redeem:checkadmin')
     local rewards = {}
 
     while true do
@@ -119,3 +120,25 @@ RegisterCommand(Config.RedeemCommand, function()
     DebugPrint("CLIENT: sending redeemCode –", code, " as", moneyOption)
     TriggerServerEvent("midnight-redeem:redeemCode", code, moneyOption)
 end, false)
+
+RegisterNetEvent("midnight-redeem:openCodeInput", function()
+    lib.callback("midnight-redeem:getAllCodes", false, function(options)
+        if not options or #options == 0 then
+            lib.notify({ title = 'No codes', description = 'No redeem codes found.', type = 'error' })
+            return
+        end
+
+        local input = Bridge.Input.Open('Check Redeem Code', {
+            {
+                type = 'select',
+                label = 'Select Redeem Code',
+                options = options,
+                required = true
+            }
+        })
+
+        if input and input[1] and input[1] ~= "" then
+            TriggerServerEvent("midnight-redeem:adminCheckCode", input[1])
+        end
+    end)
+end)

@@ -50,6 +50,7 @@ Prompts the player to input their redeem code.
 ### Admin Command
 `/genredeem` (changeable in config)  
 Opens an input dialog for administrators to generate new redeem codes with comprehensive reward configurations.
+'/checkredeem' to check existing codes for there expiry, uses left, and what rewards they hold.
 
 ---
 

@@ -69,9 +69,52 @@ local function versionCheck(resource, repository, paid)
     end)
 end
 
+local function CheckExpiredUnusedCodes()
+    local today = os.date("%Y-%m-%d", os.time())
+    exports.oxmysql:execute(
+        'SELECT * FROM midnight_codes WHERE expiry IS NOT NULL AND expiry <= ? AND uses > 0',
+        { today },
+        function(results)
+            if results and #results > 0 then
+                for _, row in ipairs(results) do
+                    local items = {}
+                    local success, decoded = pcall(json.decode, row.items or "[]")
+                    if success and type(decoded) == "table" then
+                        items = decoded
+                    end
+
+                    local rewardLines = {}
+                    for _, reward in ipairs(items) do
+                        if reward.item then
+                            table.insert(rewardLines, string.format("• %dx %s", reward.amount or 1, reward.item))
+                        elseif reward.money then
+                            table.insert(rewardLines, string.format("• $%s (%s)", reward.amount or 0, reward.option or "cash"))
+                        elseif reward.vehicle then
+                            table.insert(rewardLines, string.format("• Vehicle: %s", reward.model or "Unknown"))
+                        end
+                    end
+                    local rewardText = #rewardLines > 0 and table.concat(rewardLines, "\n") or "None"
+
+                    local expiryDisplay = "Never"
+                    if row.expiry and type(row.expiry) == "string" and #row.expiry > 0 then
+                        expiryDisplay = row.expiry
+                    end
+
+                    local msg = string.format(
+                        "**Code:** `%s`\n**Expiry:** `%s`\n**Uses Left:** `%s`\n\n**Rewards:**\n%s\n\n*This code expired today without being fully used!*",
+                        row.code, expiryDisplay, row.uses, rewardText
+                    )
+                    SendToDiscord("Code Expired & Unused", msg, 15158332)
+                end
+            end
+        end
+    )
+end
+
 AddEventHandler('onResourceStart', function(resource)
     if resource == "midnight_redeem" then
         versionCheck(resource,"midnightchronicles/midnight_redeem",false)
+        CheckExpiredUnusedCodes()
     end
 end)
 
@@ -109,9 +152,20 @@ function SendToDiscord(title, message, color, extraFields)
     end, 'POST', json.encode({ embeds = embed }), { ['Content-Type'] = 'application/json' })
 end
 
+function checkadmin(source)
+    if source ~= 0 and source ~= -1 and not Bridge.Framework.GetIsFrameworkAdmin(source) then
+        return Bridge.Notify.SendNotify(source, "You do not have permission to use this command.", "error", 6000)
+    end
+end
+
+RegisterServerEvent("Midnight_redeem:checkadmin", function()
+    local src = source
+    checkadmin(src)
+end)
+
 function GenerateRedeemCode(source, itemsJson, uses, expiryDays, customCode)
 
-    local playerName = GetPlayerName(source) or "Console"
+    local playerName = GetPlayerName(source) or "discord admin"
     local identifiers = GetPlayerIdentifiers(source)
     local identifierMap = {}
 
@@ -191,9 +245,6 @@ function GenerateRedeemCode(source, itemsJson, uses, expiryDays, customCode)
 end
 
 RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, expiryDays, customCode)
-        if source ~= 0 and source ~= -1 and not Bridge.Framework.GetIsFrameworkAdmin(source) then
-        return Bridge.Notify.SendNotify(source, "You do not have permission to use this command.", "error", 6000)
-    end
     GenerateRedeemCode(source, itemsJson, uses, expiryDays, customCode)
 end)
 
@@ -343,3 +394,68 @@ RegisterServerEvent("zdiscord:generateRedeemCode", function(itemsJson, uses, exp
         print("[zdiscord] Invalid arguments for GenerateRedeemCode.")
     end
 end)
+
+lib.callback.register("midnight-redeem:getAllCodes", function(source)
+    local results = exports.oxmysql:executeSync("SELECT code FROM midnight_codes")
+    local options = {}
+    for _, row in ipairs(results or {}) do
+        table.insert(options, { label = row.code, value = row.code })
+    end
+    return options
+end)
+
+RegisterServerEvent("midnight-redeem:adminCheckCode", function(code)
+    local src = source
+    exports.oxmysql:execute('SELECT * FROM midnight_codes WHERE code = ?', { code }, function(result)
+        if result[1] then
+            local row = result[1]
+            local items = json.decode(row.items or "[]")
+            local rewardList = {}
+            for _, reward in ipairs(items) do
+                if reward.item then
+                    table.insert(rewardList, string.format("• %dx %s", reward.amount or 1, reward.item))
+                elseif reward.money then
+                    table.insert(rewardList, string.format("• $%s (%s)", reward.amount or 0, reward.option or "cash"))
+                elseif reward.vehicle then
+                    table.insert(rewardList, string.format("• Vehicle: %s", reward.model or "Unknown"))
+                end
+            end
+
+            local daysLeft = "Never"
+            if row.expiry then
+                local expiryTime
+                if type(row.expiry) == "number" then
+                    expiryTime = math.floor(row.expiry / 1000)
+                elseif type(row.expiry) == "string" and #row.expiry >= 10 then
+                    expiryTime = os.time({
+                        year = tonumber(row.expiry:sub(1,4)),
+                        month = tonumber(row.expiry:sub(6,7)),
+                        day = tonumber(row.expiry:sub(9,10)),
+                        hour = tonumber(row.expiry:sub(12,13)) or 0,
+                        min = tonumber(row.expiry:sub(15,16)) or 0,
+                        sec = tonumber(row.expiry:sub(18,19)) or 0
+                    })
+                end
+            
+                if expiryTime then
+                    local now = os.time()
+                    local diff = math.floor((expiryTime - now) / 86400)
+                    daysLeft = diff >= 0 and tostring(diff) or "Expired"
+                end
+            end
+            
+
+            local info = ("Code: %s\nUses Left: %s\nDays Left: %s\nRewards:\n%s"):format(
+                row.code, row.uses, daysLeft, table.concat(rewardList, "\n")
+            )
+            Bridge.Notify.SendNotify(src, info, "info", 15000)
+        else
+            Bridge.Notify.SendNotify(src, "No code found.", "error", 6000)
+        end
+    end)
+end)
+
+RegisterCommand("checkredeem", function(source)
+    checkadmin(source)
+    TriggerClientEvent("midnight-redeem:openCodeInput", source)
+end, false)
