@@ -34,8 +34,7 @@ module.exports = {
             required: false,
             type: "STRING",
         },
-        // Additional slots for item/amounts (not mandatory)
-        ...Array.from({ length: 10 }, (_, i) => ([
+        ...Array.from({ length: 8 }, (_, i) => ([
             {
                 name: `itemname${i + 1}`,
                 description: `Extra item #${i + 1} name (optional).`,
