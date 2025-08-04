@@ -4,54 +4,77 @@ module.exports = {
     role: "mod",
 
     options: [
-    {
-        name: "uses",
-        description: "How many times the code can be redeemed.",
-        required: true,
-        type: "INTEGER",
-    },
-    {
-        name: "expiry",
-        description: "Days until code expires.",
-        required: true,
-        type: "INTEGER",
-    },
-    {
-        name: "customcode",
-        description: "Custom code (must be unique).",
-        required: true,
-        type: "STRING",
-    },
-    {
-        name: "itemnames",
-        description: "Comma-separated item names (e.g. water,bread).",
-        required: false,
-        type: "STRING",
-    },
-    {
-        name: "itemamounts",
-        description: "Comma-separated item amounts (e.g. 2,3, must match item names).",
-        required: false,
-        type: "STRING",
-    },
-    {
-        name: "vehicle",
-        description: "Vehicle spawn name to grant (optional).",
-        required: false,
-        type: "STRING",
-    },
-    {
-        name: "moneyamount",
-        description: "Amount of money to grant (optional).",
-        required: false,
-        type: "INTEGER",
-    },
-],
+        {
+            name: "uses",
+            description: "How many times the code can be redeemed.",
+            required: true,
+            type: "INTEGER",
+        },
+        {
+            name: "expiry",
+            description: "Days until code expires.",
+            required: true,
+            type: "INTEGER",
+        },
+        {
+            name: "customcode",
+            description: "Custom code (must be unique).",
+            required: true,
+            type: "STRING",
+        },
+        {
+            name: "itemnames",
+            description: "Comma-separated item names (e.g. water,bread).",
+            required: false,
+            type: "STRING",
+        },
+        {
+            name: "itemamounts",
+            description: "Comma-separated item amounts (e.g. 2,3, must match item names).",
+            required: false,
+            type: "STRING",
+        },
+        // Additional slots for item/amounts (not mandatory)
+        ...Array.from({ length: 10 }, (_, i) => ([
+            {
+                name: `itemname${i + 1}`,
+                description: `Extra item #${i + 1} name (optional).`,
+                required: false,
+                type: "STRING",
+            },
+            {
+                name: `itemamount${i + 1}`,
+                description: `Extra item #${i + 1} amount (optional).`,
+                required: false,
+                type: "INTEGER",
+            }
+        ])).flat(),
+        {
+            name: "vehicle",
+            description: "Vehicle spawn name to grant (optional).",
+            required: false,
+            type: "STRING",
+        },
+        {
+            name: "moneyamount",
+            description: "Amount of money to grant (optional).",
+            required: false,
+            type: "INTEGER",
+        },
+    ],
 
     run: async (client, interaction, args) => {
         let rewards = [];
 
-        if (args.itemnames && args.itemamounts) {
+        for (let i = 1; i <= 10; i++) {
+            const itemName = args[`itemname${i}`];
+            const itemAmount = args[`itemamount${i}`];
+            if (itemName && itemAmount && !isNaN(itemAmount) && itemAmount > 0) {
+                rewards.push({ item: itemName.trim(), amount: parseInt(itemAmount) });
+            }
+        }
+
+        if (rewards.length === 0 && args.itemnames && args.itemamounts) {
             const items = args.itemnames.split(",");
             const amounts = args.itemamounts.split(",");
             if (items.length !== amounts.length) {
