@@ -97,8 +97,25 @@ module.exports = {
 
         emit("zdiscord:generateRedeemCode", itemsJson, uses, expiryDays, customCode);
 
+        let description = `✅ Your redeem code: \`${customCode}\`\n`;
+        for (const reward of rewards) {
+            if (reward.item) {
+                description += `📦 Item: **${reward.item}**\n🔢 Amount: **${reward.amount}**\n`;
+            }
+            if (reward.money) {
+                description += `💰 Money: **${reward.amount}**\n`;
+            }
+            if (reward.vehicle) {
+                description += `🚗 Vehicle: **${reward.model}**\n`;
+            }
+        }
+        description += `♻️ Uses: **${uses}**\n📅 Expires in: **${expiryDays} days**`;
+
         return interaction.reply({
-            content: `Generated redeem code \`${customCode}\` for ${rewards.length} reward(s). Uses: ${uses}, Expiry: ${expiryDays} days.`,
+            embeds: [{
+                color: 0x00ff99,
+                description: description
+            }],
             ephemeral: false,
         });
     },
