@@ -54,7 +54,7 @@ Opens an input dialog for administrators to generate new redeem codes with compr
 ---
 
 
-'/checkredeem' to check existing codes for there expiry, uses left, and what rewards they hold.
+`/checkredeem` to check existing codes for there expiry, uses left, and what rewards they hold.
 
 ---
 
