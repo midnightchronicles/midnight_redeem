@@ -118,6 +118,9 @@ restart server
 good to go :)
 /generateredeem
 ```
+
+```
 you can only do upto 10 items due to discords own limitations
 itemnames: can be done single `water` or multiple like `water, sandwich, phone'
 amount: this has to be in order so if you wanted to do 5 water 10 sandwiches and 1 phone youd do like this: '5, 10, 1' in the order you done the itemnames option
+```
