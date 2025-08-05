@@ -69,55 +69,6 @@ local function versionCheck(resource, repository, paid)
     end)
 end
 
-local function CheckExpiredUnusedCodes()
-    local today = os.date("%Y-%m-%d", os.time())
-    exports.oxmysql:execute(
-        'SELECT * FROM midnight_codes WHERE expiry IS NOT NULL AND expiry <= ? AND uses > 0',
-        { today },
-        function(results)
-            if results and #results > 0 then
-                for _, row in ipairs(results) do
-                    local items = {}
-                    local success, decoded = pcall(json.decode, row.items or "[]")
-                    if success and type(decoded) == "table" then
-                        items = decoded
-                    end
-
-                    local rewardLines = {}
-                    for _, reward in ipairs(items) do
-                        if reward.item then
-                            table.insert(rewardLines, string.format("• %dx %s", reward.amount or 1, reward.item))
-                        elseif reward.money then
-                            table.insert(rewardLines, string.format("• $%s (%s)", reward.amount or 0, reward.option or "cash"))
-                        elseif reward.vehicle then
-                            table.insert(rewardLines, string.format("• Vehicle: %s", reward.model or "Unknown"))
-                        end
-                    end
-                    local rewardText = #rewardLines > 0 and table.concat(rewardLines, "\n") or "None"
-
-                    local expiryDisplay = "Never"
-                    if row.expiry and type(row.expiry) == "string" and #row.expiry > 0 then
-                        expiryDisplay = row.expiry
-                    end
-
-                    local msg = string.format(
-                        "**Code:** `%s`\n**Expiry:** `%s`\n**Uses Left:** `%s`\n\n**Rewards:**\n%s\n\n*This code expired today without being fully used!*",
-                        row.code, expiryDisplay, row.uses, rewardText
-                    )
-                    SendToDiscord("Code Expired & Unused", msg, 15158332)
-                end
-            end
-        end
-    )
-end
-
-AddEventHandler('onResourceStart', function(resource)
-    if resource == "midnight_redeem" then
-        versionCheck(resource,"midnightchronicles/midnight_redeem",false)
-        CheckExpiredUnusedCodes()
-    end
-end)
-
 function DebugPrint(message)
     if Config.Debug then
         print("[Midnight_Redeem] " .. message)
@@ -161,6 +112,57 @@ end
 RegisterServerEvent("Midnight_redeem:checkadmin", function()
     local src = source
     checkadmin(src)
+end)
+
+local function CheckExpiredUnusedCodes()
+    local today = os.date("%Y-%m-%d", os.time())
+    exports.oxmysql:execute(
+        'SELECT * FROM midnight_codes WHERE expiry IS NOT NULL AND expiry <= ? AND uses > 0',
+        { today },
+        function(results)
+            if results and #results > 0 then
+                for _, row in ipairs(results) do
+                    local items = {}
+                    local success, decoded = pcall(json.decode, row.items or "[]")
+                    if success and type(decoded) == "table" then
+                        items = decoded
+                    end
+
+                    local rewardLines = {}
+                    for _, reward in ipairs(items) do
+                        if reward.item then
+                            table.insert(rewardLines, string.format("• %dx %s", reward.amount or 1, reward.item))
+                        elseif reward.money then
+                            table.insert(rewardLines, string.format("• $%s (%s)", reward.amount or 0, reward.option or "cash"))
+                        elseif reward.vehicle then
+                            table.insert(rewardLines, string.format("• Vehicle: %s", reward.model or "Unknown"))
+                        end
+                    end
+                    local rewardText = #rewardLines > 0 and table.concat(rewardLines, "\n") or "None"
+
+                    local expiryDisplay = "Never"
+                    if row.expiry and type(row.expiry) == "string" and #row.expiry > 0 then
+                        expiryDisplay = row.expiry
+                    end
+
+                    local msg = string.format(
+                        "**Code:** `%s`\n**Expiry:** `%s`\n**Uses Left:** `%s`\n\n**Rewards:**\n%s\n\n*This code expired today without being fully used!*",
+                        row.code, expiryDisplay, row.uses, rewardText
+                    )
+                    SendToDiscord("Code Expired & Unused", msg, 15158332)
+                end
+            else
+                SendToDiscord("Code Expiry Check", "No codes expired today.", 3066993)
+            end
+        end
+    )
+end
+
+AddEventHandler('onResourceStart', function(resource)
+    if resource == "midnight_redeem" then
+        versionCheck(resource,"midnightchronicles/midnight_redeem",false)
+        CheckExpiredUnusedCodes()
+    end
 end)
 
 function GenerateRedeemCode(source, itemsJson, uses, expiryDays, customCode)
