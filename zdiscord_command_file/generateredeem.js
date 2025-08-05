@@ -34,7 +34,7 @@ module.exports = {
             required: false,
             type: "STRING",
         },
-        ...Array.from({ length: 8 }, (_, i) => ([
+        ...Array.from({ length: 0 }, (_, i) => ([
             {
                 name: `itemname${i + 1}`,
                 description: `Extra item #${i + 1} name (optional).`,
