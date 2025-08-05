@@ -158,6 +158,23 @@ local function CheckExpiredUnusedCodes()
     )
 end
 
+RegisterServerEvent("midnight-redeem:deleteCode")
+AddEventHandler("midnight-redeem:deleteCode", function(code)
+    local src = source
+    if src ~= 0 and src ~= -1 and not Bridge.Framework.GetIsFrameworkAdmin(src) then
+        return Bridge.Notify.SendNotify(src, "You do not have permission to delete codes.", "error", 6000)
+    end
+
+    exports.oxmysql:execute('DELETE FROM midnight_codes WHERE code = ?', { code }, function(affected)
+        if affected and ((type(affected) == "number" and affected > 0) or (type(affected) == "table" and affected.affectedRows and affected.affectedRows > 0)) then
+            Bridge.Notify.SendNotify(src, ("Code '%s' deleted successfully!"):format(code), "success", 6000)
+            SendToDiscord("Code Deleted", ("**Code:** `%s` was deleted by admin <@%s>."):format(code, GetPlayerName(src)), 15158332)
+        else
+            Bridge.Notify.SendNotify(src, ("Code '%s' not found or failed to delete."):format(code), "error", 6000)
+        end
+    end)
+end)
+
 AddEventHandler('onResourceStart', function(resource)
     if resource == "midnight_redeem" then
         versionCheck(resource,"midnightchronicles/midnight_redeem",false)
@@ -457,7 +474,11 @@ RegisterServerEvent("midnight-redeem:adminCheckCode", function(code)
     end)
 end)
 
-RegisterCommand("checkredeem", function(source)
+RegisterCommand(Config.AdminCommand, function(source)
     checkadmin(source)
-    TriggerClientEvent("midnight-redeem:openCodeInput", source)
+    TriggerClientEvent("midnight-redeem:openAdminMenu", source)
+end, false)
+
+RegisterCommand(Config.RedeemCommand, function(source)
+    TriggerClientEvent("midnight-redeem:redeemcode", source)
 end, false)
