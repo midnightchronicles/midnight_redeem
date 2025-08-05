@@ -1,4 +1,4 @@
-# 🎁 Midnight Redeem System
+# 🎁 Midnight Redeem System 
 
 A **simple and flexible redeem system** designed for one-off giveaways, player refunds, or event-based rewards. This system leverages input dialogs for a seamless user experience.
 
