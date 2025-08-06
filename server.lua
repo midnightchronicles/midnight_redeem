@@ -114,11 +114,11 @@ RegisterServerEvent("Midnight_redeem:checkadmin", function()
     checkadmin(src)
 end)
 
-local function CheckExpiredUnusedCodes()
-    local today = os.date("%Y-%m-%d", os.time())
+function CheckExpiredUnusedCodes()
+    local now = os.date("%Y-%m-%d %H:%M:%S")
     exports.oxmysql:execute(
         'SELECT * FROM midnight_codes WHERE expiry IS NOT NULL AND expiry <= ? AND uses > 0',
-        { today },
+        { now },
         function(results)
             if results and #results > 0 then
                 for _, row in ipairs(results) do
@@ -140,19 +140,23 @@ local function CheckExpiredUnusedCodes()
                     end
                     local rewardText = #rewardLines > 0 and table.concat(rewardLines, "\n") or "None"
 
-                    local expiryDisplay = "Never"
-                    if row.expiry and type(row.expiry) == "string" and #row.expiry > 0 then
-                        expiryDisplay = row.expiry
+                    local expiryDisplay = row.expiry
+                    if type(expiryDisplay) == "number" then
+                        expiryDisplay = math.floor(expiryDisplay / 1000)
+                        expiryDisplay = os.date("%Y-%m-%d %H:%M:%S", expiryDisplay)
+                    elseif tonumber(expiryDisplay) then
+                        expiryDisplay = math.floor(tonumber(expiryDisplay) / 1000)
+                        expiryDisplay = os.date("%Y-%m-%d %H:%M:%S", expiryDisplay)
                     end
 
                     local msg = string.format(
-                        "**Code:** `%s`\n**Expiry:** `%s`\n**Uses Left:** `%s`\n\n**Rewards:**\n%s\n\n*This code expired today without being fully used!*",
+                        "**Code:** `%s`\n**Expired:** `%s`\n**Uses Left:** `%s`\n\n**Rewards:**\n%s\n\n*This code expired without being fully used!*",
                         row.code, expiryDisplay, row.uses, rewardText
                     )
                     SendToDiscord("Code Expired & Unused", msg, 15158332)
                 end
             else
-                SendToDiscord("Code Expiry Check", "No codes expired today.", 3066993)
+                SendToDiscord("Code Expiry Check", "No codes expired right now.", 3066993)
             end
         end
     )
@@ -478,6 +482,7 @@ RegisterCommand(Config.AdminCommand, function(source)
     checkadmin(source)
     TriggerClientEvent("midnight-redeem:openAdminMenu", source)
 end, false)
+
 
 RegisterCommand(Config.RedeemCommand, function(source)
     TriggerClientEvent("midnight-redeem:redeemcode", source)
