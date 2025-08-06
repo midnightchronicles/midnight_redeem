@@ -140,7 +140,6 @@ function CheckExpiredUnusedCodes()
                     end
                     local rewardText = #rewardLines > 0 and table.concat(rewardLines, "\n") or "None"
 
-                    -- Detect and format expiry if it's a number (timestamp in ms)
                     local expiryDisplay = row.expiry
                     if type(expiryDisplay) == "number" then
                         expiryDisplay = math.floor(expiryDisplay / 1000)
@@ -483,6 +482,7 @@ RegisterCommand(Config.AdminCommand, function(source)
     checkadmin(source)
     TriggerClientEvent("midnight-redeem:openAdminMenu", source)
 end, false)
+
 
 RegisterCommand(Config.RedeemCommand, function(source)
     TriggerClientEvent("midnight-redeem:redeemcode", source)
