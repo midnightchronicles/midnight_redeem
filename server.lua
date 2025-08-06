@@ -486,7 +486,6 @@ RegisterCommand(Config.AdminCommand, function(source)
     TriggerClientEvent("midnight-redeem:openAdminMenu", source)
 end, false)
 
-
 RegisterCommand(Config.RedeemCommand, function(source)
     TriggerClientEvent("midnight-redeem:redeemcode", source)
 end, false)
