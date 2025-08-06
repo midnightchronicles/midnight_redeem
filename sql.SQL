@@ -6,6 +6,7 @@ CREATE TABLE `midnight_codes` (
     `created_by` VARCHAR(255) NOT NULL COLLATE 'utf8mb3_general_ci',
     `expiry` DATETIME NULL DEFAULT NULL,
     `redeemed_by` JSON NULL DEFAULT (JSON_OBJECT()),
+    `expired_notified` TINYINT(1) NOT NULL DEFAULT 0,
     PRIMARY KEY (`code`),
     CONSTRAINT `redeemed_by_valid` CHECK (JSON_VALID(`redeemed_by`))
 ) ENGINE=InnoDB

@@ -117,7 +117,7 @@ end)
 function CheckExpiredUnusedCodes()
     local now = os.date("%Y-%m-%d %H:%M:%S")
     exports.oxmysql:execute(
-        'SELECT * FROM midnight_codes WHERE expiry IS NOT NULL AND expiry <= ? AND uses > 0',
+        'SELECT * FROM midnight_codes WHERE expiry IS NOT NULL AND expiry <= ? AND uses > 0 AND expired_notified = 0',
         { now },
         function(results)
             if results and #results > 0 then
@@ -154,9 +154,12 @@ function CheckExpiredUnusedCodes()
                         row.code, expiryDisplay, row.uses, rewardText
                     )
                     SendToDiscord("Code Expired & Unused", msg, 15158332)
+
+                    exports.oxmysql:execute(
+                        'UPDATE midnight_codes SET expired_notified = 1 WHERE code = ?',
+                        { row.code }
+                    )
                 end
-            else
-                SendToDiscord("Code Expiry Check", "No codes expired right now.", 3066993)
             end
         end
     )
