@@ -204,6 +204,7 @@ end)
 AddEventHandler('onResourceStart', function(resource)
     if resource == "midnight_redeem" then
         versionCheck(resource,"midnightchronicles/midnight_redeem",false)
+        CheckExpiredUnusedCodes()
     end
 end)
 function GenerateRedeemCode(source, itemsJson, uses, expiryDays, customCode)
