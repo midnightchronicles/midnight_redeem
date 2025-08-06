@@ -1,13 +1,17 @@
 fx_version 'cerulean'
 game 'gta5'
-lua54 "yes"
-version '1.1.2'
+lua54 'yes'
 
+version '1.1.3'
 description 'Redeem System'
 
 shared_scripts {
     '@ox_lib/init.lua',
     'config.lua',
+}
+
+files {
+    'locales/*.json'
 }
 
 server_scripts {
@@ -20,5 +24,5 @@ client_scripts {
 }
 
 dependencies {
-'community_bridge'
+    'community_bridge'
 }
