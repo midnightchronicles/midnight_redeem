@@ -67,7 +67,6 @@ When creating a reward code, configure these fields to define its properties and
 | `amount`      | The quantity of the item to be granted.                   | `5`                     | if item chosen |
 | `money`       | the amount of money to be given                           | `5000`                  | no             |
 | `vehicle`     | vehicle name.                                             | `adder`                 | no             |
-| `model`       | The model name of the vehicle to be spawned.              | `adder`                 | no             |
 | `uses`        | The maximum number of times the code can be used in total.| `3`                     | yes            |
 | `days`        | The number of days the code remains valid from creation.  | `7`                     | yes            |
 | `custom code` | The actual code that players will enter to redeem.        | `GIFT2025`              | yes            |
