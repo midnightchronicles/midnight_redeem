@@ -2,12 +2,14 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-version '1.1.3'
+version '1.1.4' 
 description 'Redeem System'
+author 'Midnight Chronicles'
 
 shared_scripts {
     '@ox_lib/init.lua',
-    'config.lua',
+    'shared/config.lua',
+    'shared/init.lua',
 }
 
 files {
@@ -15,14 +17,16 @@ files {
 }
 
 server_scripts {
-    'server.lua'
+    '@oxmysql/lib/MySQL.lua',
+    'server/*.lua'
 }
 
 client_scripts {
-    '@qbx_core/modules/playerdata.lua',
-    'client.lua'
+    'client/*.lua'
 }
 
 dependencies {
+    'ox_lib',
+    'oxmysql',
     'community_bridge'
 }

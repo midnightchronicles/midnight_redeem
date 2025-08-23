@@ -35,6 +35,7 @@
     "ADMIN_MANAGE_CONFIRM_DELETE_YES": "Yes, delete",
     "ADMIN_MANAGE_CONFIRM_DELETE_NO": "No, cancel",
     "ADMIN_NO_CODES": "No redeem codes found.",
+    "REDEEM_NOTIFY_THING": "CLIENT: sending redeemCode - %s, %s as %s",
     "REDEEM_TITLE": "Redeem Code",
     "REDEEM_INPUT_LABEL": "Enter Redeem Code",
     "REDEEM_INPUT_PLACEHOLDER": "e.g. waterbonus2025",
@@ -49,5 +50,9 @@
     "NOTIFY_INVALID_ITEM_DATA": "invalid item data", 
     "NOTIFY_INVALID_USES": "invalid uses",
     "NOTIFY_CODE_CREATED": "code generated sucessfully",
-    "NOTIFY_FAILED_INSERT": "code failed to generate"
+    "NOTIFY_FAILED_INSERT": "code failed to generate",
+    "NOTIFY_INFO": "sucessfully redeemed",
+    "NOTIFY_CODE_NOT_FOUND": "No redeem code found matching '%s'.",
+    "NOTIFY_CODE_DELETED": "Deleted code '%s'.",
+    "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes."
   }
