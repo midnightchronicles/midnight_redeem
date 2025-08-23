@@ -61,15 +61,17 @@ Opens an input dialog for administrators to generate new redeem codes with compr
 ## 🧩 Reward Fields Explained
 When creating a reward code, configure these fields to define its properties and rewards:
 
-| Field         | Description                                               | Example                 | mandatory      |
-| :-------------|:----------------------------------------------------------|:------------------------|:---------------|
-| `item`        | The name of the inventory item to be given.               | `water`, `repair_kit`   | no             |
-| `amount`      | The quantity of the item to be granted.                   | `5`                     | if item chosen |
-| `money`       | the amount of money to be given                           | `5000`                  | no             |
-| `vehicle`     | vehicle name.                                             | `adder`                 | no             |
-| `uses`        | The maximum number of times the code can be used in total.| `3`                     | yes            |
-| `days`        | The number of days the code remains valid from creation.  | `7`                     | yes            |
-| `custom code` | The actual code that players will enter to redeem.        | `GIFT2025`              | yes            |
+| Field         | Description                                        | Example                           |
+| :------------ | :------------------------------------------------- | :-------------------------------- |
+| `item`        | The name of the inventory item to be given.        | `"water"`, `"repair_kit"`         |
+| `amount`      | The quantity of the item or money to be granted.   | `5`, `1000`                       |
+| `money`       | Set to `true` if this reward is in-game currency.  | `"money": true`                   |
+| `option`      | Specifies the money type: `"cash"` or `"bank"`.    | `"option": "cash"`                |
+| `vehicle`     | Set to `true` if this reward is a vehicle.         | `"vehicle": true`                 |
+| `model`       | The model name of the vehicle to be spawned.       | `"model": "adder"`                |
+| `uses`        | The maximum number of times the code can be used in total. | `"3"`                     |
+| `days`        | The number of days the code remains valid from creation. | `"7"`                     |
+| `custom code` | The actual string or code that players will enter to redeem. | `"GIFT2025"`              |
 
 ---
 
