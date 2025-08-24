@@ -52,6 +52,7 @@ function HandleRedeemCode(source, itemsJson, uses, expiryDays, customCode)
     expiryDays = tonumber(expiryDays)
     if not uses or uses <= 0 then return Bridge.Notify.SendNotify(source, locales("NOTIFY_INVALID_USES"), "error", 6000) end
     if not expiryDays or expiryDays < 0 then expiryDays = 0 end
+    local expiryRaw = expiryDays > 0 and os.time() + (expiryDays * 86400) or nil
     local expiryDate = expiryDays > 0 and os.date("%Y-%m-%d %H:%M:%S", os.time() + (expiryDays * 86400)) or nil
     local rewards = (type(itemsTable[1]) == "table") and itemsTable or { itemsTable }
     local totalItemCount = 0
@@ -73,7 +74,7 @@ function HandleRedeemCode(source, itemsJson, uses, expiryDays, customCode)
             elseif reward.vehicle then table.insert(rewardLines, string.format("• Vehicle: %s", reward.model or "Unknown")) end
         end
         local rewardText = table.concat(rewardLines, "\n")
-        local message = string.format("**Admin:** `%s`\n**Code:** `%s`\n**Uses:** `%s`\n**Expiry:** `%s`\n\n**Rewards:**\n%s", playerName, customCode, uses, expiryDate or "Never", rewardText)
+        local message = string.format("**Admin:** `%s`\n**Code:** `%s`\n**Uses:** `%s`\n**Expiry:** <t:%s:R>\n\n**Rewards:**\n%s", playerName, customCode, uses, expiryRaw or "Never", rewardText)
         SendToDiscord("Redeem Code Created", message, 3066993)
     else
         Bridge.Notify.SendNotify(source, locales("NOTIFY_FAILED_INSERT"), "error", 6000)
