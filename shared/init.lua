@@ -15,11 +15,40 @@ end
 
 function GenerateSQLTables()
     local result = MySQL.query.await('SHOW TABLES LIKE "midnight_codes"')
-    if #result == 0 then
-        MySQL.query.await('CREATE TABLE midnight_codes (code VARCHAR(60) NOT NULL COLLATE "utf8mb3_general_ci", total_item_count INT NOT NULL, items JSON NOT NULL, uses INT NOT NULL, created_by VARCHAR(255) NOT NULL COLLATE "utf8mb3_general_ci", expiry DATETIME NULL DEFAULT NULL, redeemed_by JSON NULL DEFAULT (JSON_OBJECT()), expired_notified TINYINT(1) NOT NULL DEFAULT 0, PRIMARY KEY (code), CONSTRAINT redeemed_by_valid CHECK (JSON_VALID(redeemed_by))) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci')
+    if not result or #result == 0 then
+        MySQL.query.await([[
+            CREATE TABLE midnight_codes (
+                code VARCHAR(60) NOT NULL COLLATE 'utf8mb3_general_ci',
+                total_item_count INT NOT NULL,
+                items JSON NOT NULL,
+                uses INT NOT NULL,
+                created_by VARCHAR(255) NOT NULL COLLATE 'utf8mb3_general_ci',
+                expiry DATETIME NULL DEFAULT NULL,
+                redeemed_by JSON NULL DEFAULT (JSON_OBJECT()),
+                expired_notified TINYINT(1) NOT NULL DEFAULT 0,
+                per_user_limit INT NOT NULL DEFAULT 1,
+                PRIMARY KEY (code),
+                CONSTRAINT redeemed_by_valid CHECK (JSON_VALID(redeemed_by))
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci
+        ]])
         print("Midnight Chronicles Setting Up The midnight_codes SQL Tables For You. This only runs once and is here to make it easy for you.")
         Wait(1000)
+        return
     end
+
+    local col = MySQL.query.await([[SHOW COLUMNS FROM midnight_codes LIKE "per_user_limit"]])
+    if not col or #col == 0 then
+        MySQL.query.await([[ALTER TABLE midnight_codes ADD COLUMN per_user_limit INT NOT NULL DEFAULT 1]])
+        print("Midnight Chronicles: Added 'per_user_limit' column to 'midnight_codes' this will only be done once to make it easy for you.")
+    end
+
+    MySQL.query.await([[
+        UPDATE midnight_codes
+           SET redeemed_by = JSON_OBJECT()
+         WHERE redeemed_by IS NULL
+            OR JSON_VALID(redeemed_by) = 0
+            OR JSON_TYPE(redeemed_by) <> 'OBJECT'
+    ]])
 end
 
 function CheckUnusedCodes()
