@@ -65,6 +65,7 @@
   "NOTIFY_INVALID_USES": "ongeldige gebruik",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",
   "NOTIFY_SUCCESSFUL_RECEIVE": "jy het hierdie kode suksesvol ingewissel",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NO_EXPIRY": "No expiry",
   "REDEEM_INPUT_LABEL": "Voer Inwissel Kode In",
   "REDEEM_INPUT_PLACEHOLDER": "bv. waterbonus2025",

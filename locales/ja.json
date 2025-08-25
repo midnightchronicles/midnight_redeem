@@ -64,6 +64,7 @@
   "NOTIFY_INVALID_OR_EXPIRED": "このコードは無効か期限切れです。",
   "NOTIFY_INVALID_USES": "無効な使用回数",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_SUCCESSFUL_RECEIVE": "このコードを正常に引き換えました",
   "NO_EXPIRY": "No expiry",
   "REDEEM_INPUT_LABEL": "引き換えコードを入力",

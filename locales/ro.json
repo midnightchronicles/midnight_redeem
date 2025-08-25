@@ -65,6 +65,7 @@
   "NOTIFY_INVALID_USES": "utilizări invalide",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",
   "NOTIFY_SUCCESSFUL_RECEIVE": "ai răscumpărat acest cod cu succes",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NO_EXPIRY": "No expiry",
   "REDEEM_INPUT_LABEL": "Introdu Codul de Răscumpărare",
   "REDEEM_INPUT_PLACEHOLDER": "ex. waterbonus2025",

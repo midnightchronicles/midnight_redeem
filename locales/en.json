@@ -71,6 +71,7 @@
   "NOTIFY_CODE_NOT_FOUND": "No redeem code found matching '%s'.",
   "NOTIFY_CODE_DELETED": "Deleted code '%s'.",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
 
   "NOTIFY_CODE_UPDATED": "Code updated successfully.",
   "NOTIFY_FAILED_UPDATE": "Failed to update the code.",

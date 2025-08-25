@@ -53,6 +53,7 @@
   "NOTIFY_CODE_CREATED": "코드가 성공적으로 생성되었습니다",
   "NOTIFY_CODE_DELETED": "Deleted code '%s'.",
   "NOTIFY_CODE_EXISTS": "That code already exists. Please choose another name.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_CODE_NOT_FOUND": "No redeem code found matching '%s'.",
   "NOTIFY_CODE_REDEEMED": "코드를 성공적으로 리딤했습니다",
   "NOTIFY_CODE_UPDATED": "Code updated successfully.",

@@ -64,6 +64,7 @@
   "NOTIFY_INVALID_OR_EXPIRED": "denne koden er ugyldig eller utløpt.",
   "NOTIFY_INVALID_USES": "ugyldig bruk",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_SUCCESSFUL_RECEIVE": "du har løst inn denne koden med suksess",
   "NO_EXPIRY": "No expiry",
   "REDEEM_INPUT_LABEL": "Skriv Innløsningskode",

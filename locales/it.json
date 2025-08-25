@@ -64,6 +64,7 @@
   "NOTIFY_INVALID_OR_EXPIRED": "questo codice non è valido o è scaduto.",
   "NOTIFY_INVALID_USES": "utilizzi non validi",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_SUCCESSFUL_RECEIVE": "hai riscattato questo codice con successo",
   "NO_EXPIRY": "No expiry",
   "REDEEM_INPUT_LABEL": "Inserisci Codice Riscatto",

@@ -64,6 +64,7 @@
   "NOTIFY_INVALID_OR_EXPIRED": "This code be invalid or expired, arrr!",
   "NOTIFY_INVALID_USES": "Invalid uses",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_SUCCESSFUL_RECEIVE": "Ye redeemed this code with success!",
   "NO_EXPIRY": "No expiry",
   "REDEEM_INPUT_LABEL": "Enter Treasure Code",

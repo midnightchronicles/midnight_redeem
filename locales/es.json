@@ -64,6 +64,7 @@
   "NOTIFY_INVALID_OR_EXPIRED": "este código es inválido o ha expirado.",
   "NOTIFY_INVALID_USES": "usos inválidos",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_SUCCESSFUL_RECEIVE": "has canjeado este código exitosamente",
   "NO_EXPIRY": "No expiry",
   "REDEEM_INPUT_LABEL": "Ingresa el Código de Canje",

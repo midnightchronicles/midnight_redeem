@@ -64,6 +64,7 @@
   "NOTIFY_INVALID_OR_EXPIRED": "ez a kód érvénytelen vagy lejárt.",
   "NOTIFY_INVALID_USES": "érvénytelen felhasználások",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_SUCCESSFUL_RECEIVE": "sikeresen beváltotta ezt a kódot",
   "NO_EXPIRY": "No expiry",
   "REDEEM_INPUT_LABEL": "Írja be a beváltó kódot",

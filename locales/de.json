@@ -61,6 +61,7 @@
   "NOTIFY_INFO": "Successfully redeemed.",
   "NOTIFY_INVALID_DATA": "Invalid data provided for code update.",
   "NOTIFY_INVALID_ITEM_DATA": "ungültige Gegenstandsdaten",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_INVALID_OR_EXPIRED": "Dieser Code ist ungültig oder abgelaufen.",
   "NOTIFY_INVALID_USES": "ungültige Verwendungen",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",

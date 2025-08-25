@@ -53,6 +53,7 @@
   "NOTIFY_CODE_CREATED": "تم إنشاء الرمز بنجاح",
   "NOTIFY_CODE_DELETED": "Deleted code '%s'.",
   "NOTIFY_CODE_EXISTS": "That code already exists. Please choose another name.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_CODE_NOT_FOUND": "No redeem code found matching '%s'.",
   "NOTIFY_CODE_REDEEMED": "تم استرداد الرمز بنجاح",
   "NOTIFY_CODE_UPDATED": "Code updated successfully.",

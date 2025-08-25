@@ -59,6 +59,7 @@
   "NOTIFY_FAILED_INSERT": "αποτυχία δημιουργίας κωδικού",
   "NOTIFY_FAILED_UPDATE": "Failed to update the code.",
   "NOTIFY_INFO": "Successfully redeemed.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_INVALID_DATA": "Invalid data provided for code update.",
   "NOTIFY_INVALID_ITEM_DATA": "μη έγκυρα δεδομένα αντικειμένου",
   "NOTIFY_INVALID_OR_EXPIRED": "αυτός ο κωδικός είναι άκυρος ή έχει λήξει.",

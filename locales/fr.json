@@ -60,6 +60,7 @@
   "NOTIFY_FAILED_UPDATE": "Failed to update the code.",
   "NOTIFY_INFO": "Successfully redeemed.",
   "NOTIFY_INVALID_DATA": "Invalid data provided for code update.",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NOTIFY_INVALID_ITEM_DATA": "données d'objet invalides",
   "NOTIFY_INVALID_OR_EXPIRED": "ce code est invalide ou expiré.",
   "NOTIFY_INVALID_USES": "utilisations invalides",

@@ -65,6 +65,7 @@
   "NOTIFY_INVALID_USES": "недействительные использования",
   "NOTIFY_PERMISSION_DENIED_DELETE": "You do not have permission to delete codes.",
   "NOTIFY_SUCCESSFUL_RECEIVE": "вы успешно активировали этот код",
+  "NOTIFY_EXPIRY_IN_PAST": "you have provided a expired date/time",
   "NO_EXPIRY": "No expiry",
   "REDEEM_INPUT_LABEL": "Введите Код Редемпции",
   "REDEEM_INPUT_PLACEHOLDER": "напр. waterbonus2025",
