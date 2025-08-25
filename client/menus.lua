@@ -106,9 +106,65 @@ local function _pickExpiryDMY(withTime)
         end
         minutes = {
             { label = "00", value = "00" },
+            { label = "01", value = "01" },
+            { label = "02", value = "02" },
+            { label = "03", value = "03" },
+            { label = "04", value = "04" },
+            { label = "05", value = "05" },
+            { label = "06", value = "06" },
+            { label = "07", value = "07" },
+            { label = "08", value = "08" },
+            { label = "09", value = "09" },
+            { label = "10", value = "10" },
+            { label = "11", value = "11" },
+            { label = "12", value = "12" },
+            { label = "13", value = "13" },
+            { label = "14", value = "14" },
             { label = "15", value = "15" },
+            { label = "16", value = "16" },
+            { label = "17", value = "17" },
+            { label = "18", value = "18" },
+            { label = "19", value = "19" },
+            { label = "20", value = "20" },
+            { label = "21", value = "21" },
+            { label = "22", value = "22" },
+            { label = "23", value = "23" },
+            { label = "24", value = "24" },
+            { label = "25", value = "25" },
+            { label = "26", value = "26" },
+            { label = "27", value = "27" },
+            { label = "28", value = "28" },
+            { label = "29", value = "29" },
             { label = "30", value = "30" },
-            { label = "45", value = "45" }
+            { label = "31", value = "31" },
+            { label = "32", value = "32" },
+            { label = "33", value = "33" },
+            { label = "34", value = "34" },
+            { label = "35", value = "35" },
+            { label = "36", value = "36" },
+            { label = "37", value = "37" },
+            { label = "38", value = "38" },
+            { label = "39", value = "39" },
+            { label = "40", value = "40" },
+            { label = "41", value = "41" },
+            { label = "42", value = "42" },
+            { label = "43", value = "43" },
+            { label = "44", value = "44" },
+            { label = "45", value = "45" },
+            { label = "46", value = "46" },
+            { label = "47", value = "47" },
+            { label = "48", value = "48" },
+            { label = "49", value = "49" },
+            { label = "50", value = "50" },
+            { label = "51", value = "51" },
+            { label = "52", value = "52" },
+            { label = "53", value = "53" },
+            { label = "54", value = "54" },
+            { label = "55", value = "55" },
+            { label = "56", value = "56" },
+            { label = "57", value = "57" },
+            { label = "58", value = "58" },
+            { label = "59", value = "59" },
         }
         table.insert(selects, { type = 'select', label = locales("HOUR")   or "Hour",   options = hours,   required = true })
         table.insert(selects, { type = 'select', label = locales("MINUTE") or "Minute", options = minutes, required = true })
@@ -190,41 +246,69 @@ local function openEditCodeMenu(selectedCode)
 
         local daysLeft = _expiryToDaysLeft(details.expiry)
 
-        local overwriteQ = Bridge.Input.Open(locales("ADMIN_EDIT_REWARDS_TITLE") or "Edit rewards?",
-        {{
-            type = 'select',
-            label = locales("ADMIN_EDIT_REWARDS_LABEL") or "Do you want to overwrite rewards?",
-            options = {
-                { label = locales("GENERIC_YES") or "Yes", value = 'yes' },
-                { label = locales("GENERIC_NO")  or "No",  value = 'no'  }
-            },
-            required = true
-        }})
+        local overwriteQ = Bridge.Input.Open(locales("ADMIN_EDIT_REWARDS_TITLE") or "Edit rewards?", {
+            {
+                type = 'select',
+                label = (locales("ADMIN_EDIT_REWARDS_LABEL") or "Do you want to overwrite rewards?"),
+                options = {
+                    { label = (locales("GENERIC_YES") or "Yes"), value = 'yes' },
+                    { label = (locales("GENERIC_NO")  or "No"),  value = 'no'  }
+                },
+                required = true
+            }
+        })
+        if not overwriteQ then
+            return
+        end
 
-        if not overwriteQ then return end
         local overwrite = overwriteQ[1] == 'yes'
-
         if overwrite then
             return startRewardRebuildForEdit(details)
-        else
-            local meta = Bridge.Input.Open(locales("ADMIN_EDIT_META_TITLE") or "Edit code details", {
-                { type = 'number', label = (locales("ADMIN_FINALIZE_USES_LABEL")   or "Uses"),                   placeholder = tostring(details.uses or 0), required = false },
-                { type = 'number', label = (locales("ADMIN_FINALIZE_EXPIRY_LABEL") or "Expiry (days)"),          placeholder = tostring(daysLeft or 0),     required = false },
-                { type = 'input',  label = (locales("ADMIN_FINALIZE_CODE_LABEL")   or "Code (rename optional)"), placeholder = tostring(details.code or ""), required = false },
-            })
-            if not meta then return end
-
-            local newUses   = tonumber(meta[1])
-            local newExpiry = tonumber(meta[2])
-            local newCode   = _normalizeCode(meta[3])
-
-            TriggerServerEvent("midnight-redeem:updateCode", {
-                originalCode = details.code,
-                uses         = newUses,
-                expiryDays   = newExpiry,
-                newCode      = (newCode ~= "" and newCode or nil)
-            })
         end
+
+        local meta = Bridge.Input.Open(locales("ADMIN_EDIT_META_TITLE") or "Edit code details", {
+            { type = 'number', label = (locales("ADMIN_FINALIZE_USES_LABEL")   or "Uses"),                   placeholder = tostring(details.uses or 0), required = false },
+            { type = 'number', label = (locales("ADMIN_FINALIZE_EXPIRY_LABEL") or "Expiry (days)"),          placeholder = tostring(daysLeft or 0),     required = false },
+            { type = 'input',  label = (locales("ADMIN_FINALIZE_CODE_LABEL")   or "Code (rename optional)"), placeholder = tostring(details.code or ""), required = false },
+            { type = 'number', label = (locales("ADMIN_PER_USER_LIMIT_LABEL")  or "Per-user uses (0 = unlimited)"),
+                                placeholder = tostring(details.per_user_limit or 1), required = false },
+        })
+        if not meta then
+            return
+        end
+
+        local newUses     = tonumber(meta[1])
+        local newExpiry   = tonumber(meta[2])
+
+        local function trim(s) return (s or ""):gsub("^%s+", ""):gsub("%s+$", "") end
+        local newCodeRaw  = meta[3] or ""
+        local newCode     = _normalizeCode(trim(newCodeRaw))
+
+        local newPerUser  = tonumber(meta[4] or details.per_user_limit or 1)
+
+        local minLen2 = tonumber(Config and Config.mincustomchar) or 0
+        if newCode ~= "" and minLen2 > 0 then
+            local l = (utf8 and utf8.len and utf8.len(newCode)) or #newCode
+            if l < minLen2 then
+                local msg = (locales and locales("ADMIN_CODE_TOO_SHORT", minLen2))
+                            or ("Custom code must be at least " .. minLen2 .. " characters long.")
+                NotificationUser(nil, msg, 'error')
+                return openEditCodeMenu(selectedCode)
+            end
+        end
+
+        if newPerUser ~= nil and newPerUser < 0 then
+            NotificationUser(nil, (locales("ADMIN_PER_USER_LIMIT_INVALID") or "Per-user uses must be 0 or a positive number."), 'error')
+            return openEditCodeMenu(selectedCode)
+        end
+
+        TriggerServerEvent("midnight-redeem:updateCode", {
+            originalCode = details.code,
+            uses         = newUses,
+            expiryDays   = newExpiry,
+            newCode      = (newCode ~= "" and newCode or nil),
+            perUserLimit = newPerUser
+        })
     end, selectedCode)
 end
 
@@ -387,31 +471,72 @@ function generateCodeSubMenu(rewards, skipAddAnotherPrompt)
                 required = true
             }
         })
-        if not choiceInput then return end
-
+        if not choiceInput then
+            return
+        end
         if choiceInput[1] == 'yes' then
             return generateCodeMenu(rewards)
         end
     end
 
-    local finalInputPart1 = Bridge.Input.Open(locales("ADMIN_FINALIZE_TITLE"), {
-        { type = 'input',  label = locales("ADMIN_FINALIZE_VEHICLE_LABEL"), placeholder = locales("ADMIN_FINALIZE_VEHICLE_PLACEHOLDER"), required = false },
-        { type = 'number', label = locales("ADMIN_FINALIZE_MONEY_LABEL"),   placeholder = locales("ADMIN_FINALIZE_MONEY_PLACEHOLDER"),   required = false },
-        { type = 'number', label = locales("ADMIN_FINALIZE_USES_LABEL"),    placeholder = locales("ADMIN_FINALIZE_USES_PLACEHOLDER"),    required = true },
-        { type = 'input',  label = locales("ADMIN_FINALIZE_CODE_LABEL"),    placeholder = locales("ADMIN_FINALIZE_CODE_PLACEHOLDER"),    required = true }
-    })
-    if not finalInputPart1 then return end
+    local function trim(s) return (s or ""):gsub("^%s+", ""):gsub("%s+$", "") end
+    local minLen = tonumber(Config and Config.mincustomchar) or 0
+
+    local vehicleName, moneyAmount, uses, code, perUserLimit
+    local valid
+
+    repeat
+        valid = true
+
+        local finalInputPart1 = Bridge.Input.Open(locales("ADMIN_FINALIZE_TITLE"), {
+            { type = 'input',  label = locales("ADMIN_FINALIZE_VEHICLE_LABEL"), placeholder = locales("ADMIN_FINALIZE_VEHICLE_PLACEHOLDER"), required = false },
+            { type = 'number', label = locales("ADMIN_FINALIZE_MONEY_LABEL"),   placeholder = locales("ADMIN_FINALIZE_MONEY_PLACEHOLDER"),   required = false },
+            { type = 'number', label = locales("ADMIN_FINALIZE_USES_LABEL"),    placeholder = locales("ADMIN_FINALIZE_USES_PLACEHOLDER"),    required = true },
+            { type = 'input',  label = locales("ADMIN_FINALIZE_CODE_LABEL"),    placeholder = locales("ADMIN_FINALIZE_CODE_PLACEHOLDER"),    required = true },
+            { type = 'number', label = (locales("ADMIN_PER_USER_LIMIT_LABEL") or "Per-user uses (0 = unlimited)"), placeholder = "1", required = true }
+        })
+
+        if not finalInputPart1 then
+            return
+        end
+
+        vehicleName  = finalInputPart1[1] ~= "" and finalInputPart1[1] or nil
+        moneyAmount  = tonumber(finalInputPart1[2])
+        uses         = tonumber(finalInputPart1[3])
+        code         = trim(finalInputPart1[4])
+        perUserLimit = tonumber(finalInputPart1[5] or 1)
+
+        if not uses or uses <= 0 then
+            NotificationUser(nil, locales("NOTIFY_INVALID_USES") or "Uses must be a positive number.", 'error')
+            valid = false
+        end
+
+        if perUserLimit == nil or perUserLimit < 0 then
+            NotificationUser(nil, (locales("ADMIN_PER_USER_LIMIT_INVALID") or "Per-user uses must be 0 or a positive number."), 'error')
+            valid = false
+        end
+
+        if minLen > 0 then
+            local len = (utf8 and utf8.len and utf8.len(code)) or #code
+            if len < minLen then
+                local msg = (locales and locales("ADMIN_CODE_TOO_SHORT", minLen)) or ("Custom code must be at least " .. minLen .. " characters long.")
+                NotificationUser(nil, msg, 'error')
+                valid = false
+            end
+        end
+    until valid
 
     local expiryPick = _pickExpiryDMY(true)
-    if not expiryPick then return end
+    if not expiryPick then
+        return
+    end
 
-    local vehicleName = finalInputPart1[1] ~= "" and finalInputPart1[1] or nil
-    local moneyAmount = tonumber(finalInputPart1[2])
-    local uses        = tonumber(finalInputPart1[3])
-    local code        = finalInputPart1[4]
-
-    if moneyAmount and moneyAmount > 0 then table.insert(rewards, { money = true, amount = moneyAmount }) end
-    if vehicleName then table.insert(rewards, { vehicle = true, model = vehicleName }) end
+    if moneyAmount and moneyAmount > 0 then
+        table.insert(rewards, { money = true, amount = moneyAmount })
+    end
+    if vehicleName then
+        table.insert(rewards, { vehicle = true, model = vehicleName })
+    end
 
     if #rewards == 0 and not vehicleName and not (moneyAmount and moneyAmount > 0) then
         return NotificationUser(nil, locales("ADMIN_REQUIRE_ITEM") or "Please add at least one reward (item, money, or vehicle).", 'error')
@@ -428,7 +553,8 @@ function generateCodeSubMenu(rewards, skipAddAnotherPrompt)
         json.encode(rewards),
         uses,
         (expiryAbs and expiryAbs or expiryArgDays),
-        code
+        code,
+        perUserLimit
     )
 end
 
