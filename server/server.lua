@@ -105,11 +105,11 @@ RegisterServerEvent("midnight-redeem:deleteCode", function(code)
     end
 end)
 
-function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode)
+function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode, perUserLimit)
     local playerName = GetPlayerName(source) or "discord admin"
 
-    local success, itemsTable = pcall(json_decode, itemsJson)
-    if not success or type(itemsTable) ~= "table" then
+    local ok, itemsTable = pcall(json_decode, itemsJson)
+    if not ok or type(itemsTable) ~= "table" then
         return Bridge.Notify.SendNotify(source, locales("NOTIFY_INVALID_ITEM_DATA"), "error", 6000)
     end
 
@@ -119,7 +119,6 @@ function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode)
     end
 
     local expiryDate = parse_expiry_flexible(expiryFlexible)
-
     local expiryRawUnix = nil
     do
         local days = tonumber(expiryFlexible)
@@ -127,12 +126,23 @@ function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode)
             if days > 0 then
                 expiryRawUnix = os.time() + (days * 86400)
             else
-                expiryRawUnix = nil
+                expiryRawUnix = nil -- Never
             end
         else
-            expiryRawUnix = iso_to_unix(expiryDate or expiryFlexible)
+            local ts = iso_to_unix(expiryDate or expiryFlexible)
+            ts = ts and tonumber(ts) or nil
+            if ts and ts > 9999999999 then ts = math.floor(ts / 1000) end
+            expiryRawUnix = ts
         end
     end
+
+    if expiryRawUnix and expiryRawUnix <= os.time() then
+        local msg = (locales and (locales("NOTIFY_EXPIRY_IN_PAST") or nil)) or "The expiry date/time is already in the past."
+        return Bridge.Notify.SendNotify(source, msg, "error", 6000)
+    end
+
+    perUserLimit = tonumber(perUserLimit)
+    if perUserLimit == nil or perUserLimit < 0 then perUserLimit = 1 end
 
     local rewards = (type(itemsTable[1]) == "table") and itemsTable or { itemsTable }
 
@@ -144,27 +154,38 @@ function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode)
     end
 
     local insertId = MySQL.insert.await(
-        'INSERT INTO midnight_codes (code, total_item_count, items, uses, created_by, expiry, redeemed_by, expired_notified) VALUES (?, ?, ?, ?, ?, ?, ?, 0)',
-        { customCode, totalItemCount, itemsJson, uses, playerName, expiryDate, json_encode({}) }
+        'INSERT INTO midnight_codes (code, total_item_count, items, uses, created_by, expiry, redeemed_by, expired_notified, per_user_limit) VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)',
+        { customCode, totalItemCount, itemsJson, uses, playerName, expiryDate, json_encode({}), perUserLimit }
     )
 
     if insertId then
         TriggerClientEvent("midnight-redeem:notifyUser", source, locales("NOTIFY_CODE_CREATED"), locales("NOTIFY_CODE_CREATED"), "success")
 
         local _, rewardText = build_reward_lines(rewards)
-        local expiryHuman = expiryRawUnix and ("<t:" .. tostring(expiryRawUnix) .. ":R>") or "Never"
+
+        local expiryHuman
+        if not expiryRawUnix then
+            expiryHuman = "Never"
+        else
+            local ts = math.floor(expiryRawUnix)
+            expiryHuman = "<t:" .. ts .. ":f> (<t:" .. ts .. ":R>)"
+        end
+
+        local perUserHuman = (perUserLimit == 0) and "Unlimited" or tostring(perUserLimit)
+
         local message = string.format(
-            "**Admin:** `%s`\n**Code:** `%s`\n**Uses:** `%s`\n**Expiry:** %s\n\n**Rewards:**\n%s",
-            playerName, customCode, uses, expiryHuman, rewardText
+            "**Admin:** `%s`\n**Code:** `%s`\n**Uses:** `%s`\n**Per-User Limit:** `%s`\n**Expiry:** %s\n\n**Rewards:**\n%s",
+            playerName, customCode, uses, perUserHuman, expiryHuman, rewardText
         )
+
         SendToDiscord("Redeem Code Created", message, 3066993)
     else
         Bridge.Notify.SendNotify(source, locales("NOTIFY_FAILED_INSERT"), "error", 6000)
     end
 end
 
-RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, expiryDays, customCode)
-    HandleRedeemCode(source, itemsJson, uses, expiryDays, customCode)
+RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, expiryDays, customCode, perUserLimit)
+    HandleRedeemCode(source, itemsJson, uses, expiryDays, customCode, perUserLimit)
 end)
 
 local function addVehicleToGarage(model, playerName, uniqueId)
@@ -191,7 +212,7 @@ local function handleCodeRedemption(src, code, option)
     local playerName= GetPlayerName(src)
 
     local row = (MySQL.query.await(
-        'SELECT items FROM midnight_codes WHERE code = ? AND (expiry IS NULL OR expiry > NOW()) LIMIT 1',
+        'SELECT items, per_user_limit, redeemed_by FROM midnight_codes WHERE code = ? AND (expiry IS NULL OR expiry > NOW()) LIMIT 1',
         { code }
     ) or {})[1]
 
@@ -200,20 +221,79 @@ local function handleCodeRedemption(src, code, option)
     end
 
     local items = safe_json_decode(row.items, {})
-
     local jsonPath = '$."' .. uniqueId .. '"'
+
     local affected = MySQL.update.await([[
         UPDATE midnight_codes
            SET uses = uses - 1,
-               redeemed_by = JSON_SET(redeemed_by, ?, true)
+               redeemed_by = JSON_SET(
+                   CASE
+                       WHEN redeemed_by IS NULL
+                            OR JSON_VALID(redeemed_by) = 0
+                            OR JSON_TYPE(redeemed_by) <> 'OBJECT'
+                       THEN JSON_OBJECT()
+                       ELSE redeemed_by
+                   END,
+                   ?,  -- path
+                   COALESCE(
+                       CAST(
+                           JSON_UNQUOTE(
+                               JSON_EXTRACT(
+                                   CASE
+                                       WHEN redeemed_by IS NULL
+                                            OR JSON_VALID(redeemed_by) = 0
+                                            OR JSON_TYPE(redeemed_by) <> 'OBJECT'
+                                       THEN JSON_OBJECT()
+                                       ELSE redeemed_by
+                                   END,
+                                   ?
+                               )
+                           ) AS UNSIGNED
+                       ),
+                       0
+                   ) + 1
+               )
          WHERE code = ?
            AND (expiry IS NULL OR expiry > NOW())
            AND uses > 0
-           AND JSON_EXTRACT(redeemed_by, ?) IS NULL
-    ]], { jsonPath, code, jsonPath })
+           AND (
+                 per_user_limit = 0
+                 OR COALESCE(
+                        CAST(
+                            JSON_UNQUOTE(
+                                JSON_EXTRACT(
+                                    CASE
+                                        WHEN redeemed_by IS NULL
+                                             OR JSON_VALID(redeemed_by) = 0
+                                             OR JSON_TYPE(redeemed_by) <> 'OBJECT'
+                                    THEN JSON_OBJECT()
+                                    ELSE redeemed_by
+                                    END,
+                                    ?
+                                )
+                            ) AS UNSIGNED
+                        ),
+                        0
+                    ) < per_user_limit
+               )
+    ]], { jsonPath, jsonPath, code, jsonPath })
 
     if (affected or 0) <= 0 then
-        return Bridge.Notify.SendNotify(src, locales("NOTIFY_ALREADY_REDEEMED"), "error", 6000)
+        local curCount, limit = 0, 1
+        if row then
+            limit = tonumber(row.per_user_limit or 1) or 1
+            if row.redeemed_by then
+                local okJ, parsed = pcall(json.decode, row.redeemed_by)
+                if okJ and type(parsed) == "table" then
+                    local v = parsed[uniqueId]
+                    if type(v) == "number" then curCount = v end
+                end
+            end
+        end
+        if limit > 0 and curCount >= limit then
+            return Bridge.Notify.SendNotify(src, (locales("NOTIFY_PER_USER_LIMIT_REACHED") or "You have reached the per-user redemption limit for this code."), "error", 6000)
+        end
+        return Bridge.Notify.SendNotify(src, (locales("NOTIFY_ALREADY_REDEEMED") or "You have already redeemed this code."), "error", 6000)
     end
 
     local receivedSummary = {}
@@ -234,13 +314,76 @@ local function handleCodeRedemption(src, code, option)
     local notifyMsg = locales("NOTIFY_SUCCESSFUL_RECEIVE", table.concat(receivedSummary, "\n"))
     TriggerClientEvent("midnight-redeem:notifyUser", src, locales("NOTIFY_CODE_REDEEMED"), notifyMsg, "success")
 
+    local infoRow = (MySQL.query.await(
+        'SELECT per_user_limit, redeemed_by, uses, expiry FROM midnight_codes WHERE code = ? LIMIT 1',
+        { code }
+    ) or {})[1]
+
+    local perUserLeftText, usesLeftText, expiryText = "N/A", "N/A", "Never"
+    if infoRow then
+        local limitVal = tonumber(infoRow.per_user_limit or 0) or 0
+        local used = 0
+        if infoRow.redeemed_by then
+            local okJ, parsed = pcall(json.decode, infoRow.redeemed_by)
+            if okJ and type(parsed) == "table" then
+                local v = parsed[uniqueId]
+                if type(v) == "number" then used = v end
+            end
+        end
+        if limitVal == 0 then
+            perUserLeftText = "Unlimited"
+        else
+            local left = math.max(limitVal - used, 0)
+            perUserLeftText = string.format("%d left (used %d/%d)", left, used, limitVal)
+        end
+
+        local usesLeft = tonumber(infoRow.uses)
+        if usesLeft ~= nil then
+            usesLeftText = tostring(usesLeft)
+        end
+
+        local ts
+        local e = infoRow.expiry
+        if e ~= nil then
+            local et = type(e)
+            if et == "string" then
+                ts = iso_to_unix(e)
+                if not ts then
+                    local y, mo, d, h, mi = e:match("^(%d%d%d%d)%-(%d%d)%-(%d%d) (%d%d):(%d%d)$")
+                    if y then
+                        ts = os.time({
+                            year = tonumber(y), month = tonumber(mo), day = tonumber(d),
+                            hour = tonumber(h), min = tonumber(mi), sec = 0
+                        })
+                    end
+                end
+            elseif et == "number" then
+                ts = (e > 1e12) and math.floor(e / 1000) or e
+            elseif et == "table" then
+                if e.year and e.month and e.day then
+                    ts = os.time({
+                        year = tonumber(e.year), month = tonumber(e.month), day = tonumber(e.day),
+                        hour = tonumber(e.hour or 0), min = tonumber(e.min or 0), sec = tonumber(e.sec or 0)
+                    })
+                end
+            end
+        end
+
+        if ts and ts > 0 then
+            expiryText = "<t:" .. tostring(ts) .. ":f> (<t:" .. tostring(ts) .. ":R>)"
+        else
+            expiryText = "Never"
+        end
+    end
+
+    -- Discord embed
     local safePlayerName = playerName or "N/A"
     local safeCode = code or "N/A"
     local safeSummary = (#receivedSummary > 0 and table.concat(receivedSummary, "\n")) or "N/A"
     local safeUniqueId = uniqueId or "N/A"
 
-    local message = ("**Redeemed By:** `%s`\n**Code:** `%s`\n**Rewards:**\n%s\n**Identifiers:**\n- UniqueID: `%s`")
-        :format(safePlayerName, safeCode, safeSummary, safeUniqueId)
+    local message = ("**Redeemed By:** `%s`\n**Code:** `%s`\n**Uses Left:** `%s`\n**User limit Remaining:** %s\n**Expiry:** %s\n**Rewards:**\n%s\n**Identifiers:**\n- UniqueID: `%s`")
+        :format(safePlayerName, safeCode, usesLeftText, perUserLeftText, expiryText, safeSummary, safeUniqueId)
     SendToDiscord("Code Redeemed", message, 15844367)
 end
 
@@ -248,21 +391,22 @@ RegisterServerEvent("midnight-redeem:redeemCode", function(code, option)
     handleCodeRedemption(source, code, option)
 end)
 
-exports('GenerateRedeemCode', function(source, itemsJson, uses, expiryDays, customCode)
-    HandleRedeemCode(source, itemsJson, uses, expiryDays, customCode)
+exports('GenerateRedeemCode', function(source, itemsJson, uses, expiryDays, customCode, perUserLimit)
+    HandleRedeemCode(source, itemsJson, uses, expiryDays, customCode, perUserLimit)
 end)
 
-RegisterServerEvent("zdiscord:generateRedeemCode", function(itemsJson, uses, expiryFlexible, customCode)
+RegisterServerEvent("zdiscord:generateRedeemCode", function(itemsJson, uses, expiryFlexible, customCode, perUserLimit)
     local usesNum = tonumber(uses)
     local expArg = expiryFlexible
     if type(expiryFlexible) == "string" then
         local d = tonumber(expiryFlexible)
         if d then expArg = d end
     end
+    local perUser = tonumber(perUserLimit)
 
     if itemsJson and usesNum and expArg ~= nil and customCode then
-        exports["midnight_redeem"]:GenerateRedeemCode(source, itemsJson, usesNum, expArg, customCode)
-        print(("Generated redeem code with rewards %s, uses %s, expiry %s, code %s"):format(itemsJson, usesNum, tostring(expArg), customCode))
+        exports["midnight_redeem"]:GenerateRedeemCode(source, itemsJson, usesNum, expArg, customCode, perUser)
+        print(("Generated redeem code with rewards %s, uses %s, expiry %s, code %s, perUser %s"):format(itemsJson, usesNum, tostring(expArg), customCode, tostring(perUser)))
     else
         print("[zdiscord] Invalid arguments for GenerateRedeemCode.")
     end
@@ -328,7 +472,7 @@ RegisterServerEvent("midnight-redeem:adminCheckCode", function(code)
 end)
 
 lib.callback.register("midnight-redeem:getCodeDetails", function(src, code)
-    local result = exports.oxmysql:executeSync('SELECT code, uses, expiry, items FROM midnight_codes WHERE code = ?', { code })
+    local result = exports.oxmysql:executeSync('SELECT code, uses, expiry, items, per_user_limit FROM midnight_codes WHERE code = ?', { code })
     local row = result and result[1]
     if not row then return nil end
 
@@ -350,7 +494,8 @@ lib.callback.register("midnight-redeem:getCodeDetails", function(src, code)
         code  = row.code,
         uses  = row.uses,
         expiry= expStr,
-        items = itemsTbl
+        items = itemsTbl,
+        per_user_limit = row.per_user_limit
     }
 end)
 
@@ -369,6 +514,11 @@ RegisterServerEvent("midnight-redeem:updateCode", function(payload)
         return Bridge.Notify.SendNotify(src, locales("NOTIFY_NO_CODE_FOUND") or "Code not found.", "error", 6000)
     end
     cur = cur[1]
+    local newPerUser = cur.per_user_limit
+    if payload.perUserLimit ~= nil then
+        local p = tonumber(payload.perUserLimit)
+        if p and p >= 0 then newPerUser = p end
+    end
 
     local newItemsJson = payload.itemsJson or cur.items
     local newUses = payload.uses or cur.uses
@@ -411,11 +561,11 @@ RegisterServerEvent("midnight-redeem:updateCode", function(payload)
 
     local q = [[
         UPDATE midnight_codes
-        SET code = ?, items = ?, uses = ?, expiry = ?, total_item_count = ?
+        SET code = ?, items = ?, uses = ?, expiry = ?, total_item_count = ?, per_user_limit = ?
         WHERE code = ?
     ]]
 
-    exports.oxmysql:execute(q, { newCode, newItemsJson, newUses, newExpiry, totalItemCount, cur.code }, function(affected)
+    exports.oxmysql:execute(q, { newCode, newItemsJson, newUses, newExpiry, totalItemCount, newPerUser, cur.code }, function(affected)
         local okA = affected and ((type(affected) == "number" and affected > 0) or (type(affected) == "table" and affected.affectedRows and affected.affectedRows > 0))
         if okA then
             Bridge.Notify.SendNotify(src, locales("NOTIFY_CODE_UPDATED") or "Code updated.", "success", 6000)
