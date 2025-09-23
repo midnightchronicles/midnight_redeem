@@ -1,5 +1,16 @@
 local Bridge = exports['community_bridge']:Bridge()
 
+function Debugprint(msg)
+    if Config.Debug then
+        print("[midnight_redeem] " .. msg)
+    end
+end
+
+function Checkadmin(src)
+    if not Bridge.Framework.GetIsFrameworkAdmin(src) then return false, Bridge.Notify.SendNotify(src, locales("NOTIFY_PERMISSION_DENIED"), "error", 6000) end
+    return true
+end
+
 local json_decode = json.decode
 local json_encode = json.encode
 local fmt = string.format
@@ -105,17 +116,30 @@ RegisterServerEvent("midnight-redeem:deleteCode", function(code)
     end
 end)
 
-function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode, perUserLimit)
-    local playerName = GetPlayerName(source) or "discord admin"
+function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode, perUserLimit, createdByOverride)
+    local hasPlayer = (type(source) == "number" and source > 0)
+    local playerName = createdByOverride
+                      or (hasPlayer and (GetPlayerName(source) or "ingame moderator"))
+                      or "discord admin"
 
     local ok, itemsTable = pcall(json_decode, itemsJson)
     if not ok or type(itemsTable) ~= "table" then
-        return Bridge.Notify.SendNotify(source, locales("NOTIFY_INVALID_ITEM_DATA"), "error", 6000)
+        if hasPlayer then
+            return Bridge.Notify.SendNotify(source, locales("NOTIFY_INVALID_ITEM_DATA"), "error", 6000)
+        else
+            Debugprint("[midnight_redeem] Invalid item data for code creation.")
+            return
+        end
     end
 
     uses = tonumber(uses)
     if not uses or uses <= 0 then
-        return Bridge.Notify.SendNotify(source, locales("NOTIFY_INVALID_USES"), "error", 6000)
+        if hasPlayer then
+            return Bridge.Notify.SendNotify(source, locales("NOTIFY_INVALID_USES"), "error", 6000)
+        else
+            Debugprint("[midnight_redeem] Invalid uses for code creation.")
+            return
+        end
     end
 
     local expiryDate = parse_expiry_flexible(expiryFlexible)
@@ -126,7 +150,7 @@ function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode, p
             if days > 0 then
                 expiryRawUnix = os.time() + (days * 86400)
             else
-                expiryRawUnix = nil -- Never
+                expiryRawUnix = nil
             end
         else
             local ts = iso_to_unix(expiryDate or expiryFlexible)
@@ -138,7 +162,12 @@ function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode, p
 
     if expiryRawUnix and expiryRawUnix <= os.time() then
         local msg = (locales and (locales("NOTIFY_EXPIRY_IN_PAST") or nil)) or "The expiry date/time is already in the past."
-        return Bridge.Notify.SendNotify(source, msg, "error", 6000)
+        if hasPlayer then
+            return Bridge.Notify.SendNotify(source, msg, "error", 6000)
+        else
+            Debugprint("[midnight_redeem] " .. msg)
+            return
+        end
     end
 
     perUserLimit = tonumber(perUserLimit)
@@ -159,7 +188,9 @@ function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode, p
     )
 
     if insertId then
-        TriggerClientEvent("midnight-redeem:notifyUser", source, locales("NOTIFY_CODE_CREATED"), locales("NOTIFY_CODE_CREATED"), "success")
+        if hasPlayer then
+            TriggerClientEvent("midnight-redeem:notifyUser", source, locales("NOTIFY_CODE_CREATED"), locales("NOTIFY_CODE_CREATED"), "success")
+        end
 
         local _, rewardText = build_reward_lines(rewards)
 
@@ -179,8 +210,19 @@ function HandleRedeemCode(source, itemsJson, uses, expiryFlexible, customCode, p
         )
 
         SendToDiscord("Redeem Code Created", message, 3066993)
+        local dbgExpiry = expiryDate or "Never"
+        local dbgUnix   = expiryRawUnix and tostring(expiryRawUnix) or "nil"
+        local dbgRewards = (rewardText or "None"):gsub("\n", " | ")
+        Debugprint(("[CreateCode] insertId=%s code='%s' uses=%d perUser=%s expiry='%s' (unix=%s) created_by='%s' totalItems=%d rewards=[%s]")
+            :format(tostring(insertId), tostring(customCode), tonumber(uses) or 0, tostring(perUserLimit),
+                    dbgExpiry, dbgUnix, tostring(playerName), tonumber(totalItemCount) or 0, dbgRewards))
+
     else
-        Bridge.Notify.SendNotify(source, locales("NOTIFY_FAILED_INSERT"), "error", 6000)
+        if hasPlayer then
+            Bridge.Notify.SendNotify(source, locales("NOTIFY_FAILED_INSERT"), "error", 6000)
+        else
+            Debugprint("[midnight_redeem] Failed to insert daily/system code.")
+        end
     end
 end
 
@@ -376,14 +418,13 @@ local function handleCodeRedemption(src, code, option)
         end
     end
 
-    -- Discord embed
-    local safePlayerName = playerName or "N/A"
-    local safeCode = code or "N/A"
-    local safeSummary = (#receivedSummary > 0 and table.concat(receivedSummary, "\n")) or "N/A"
-    local safeUniqueId = uniqueId or "N/A"
+    local PlayerName = playerName or "N/A"
+    local Code = code or "N/A"
+    local Summary = (#receivedSummary > 0 and table.concat(receivedSummary, "\n")) or "N/A"
+    local UniqueId = uniqueId or "N/A"
 
     local message = ("**Redeemed By:** `%s`\n**Code:** `%s`\n**Uses Left:** `%s`\n**User limit Remaining:** %s\n**Expiry:** %s\n**Rewards:**\n%s\n**Identifiers:**\n- UniqueID: `%s`")
-        :format(safePlayerName, safeCode, usesLeftText, perUserLeftText, expiryText, safeSummary, safeUniqueId)
+        :format(PlayerName, Code, usesLeftText, perUserLeftText, expiryText, Summary, UniqueId)
     SendToDiscord("Code Redeemed", message, 15844367)
 end
 
@@ -396,21 +437,24 @@ exports('GenerateRedeemCode', function(source, itemsJson, uses, expiryDays, cust
 end)
 
 RegisterServerEvent("zdiscord:generateRedeemCode", function(itemsJson, uses, expiryFlexible, customCode, perUserLimit)
-    local usesNum = tonumber(uses)
-    local expArg = expiryFlexible
-    if type(expiryFlexible) == "string" then
-        local d = tonumber(expiryFlexible)
-        if d then expArg = d end
-    end
-    local perUser = tonumber(perUserLimit)
-
-    if itemsJson and usesNum and expArg ~= nil and customCode then
-        exports["midnight_redeem"]:GenerateRedeemCode(source, itemsJson, usesNum, expArg, customCode, perUser)
-        print(("Generated redeem code with rewards %s, uses %s, expiry %s, code %s, perUser %s"):format(itemsJson, usesNum, tostring(expArg), customCode, tostring(perUser)))
-    else
-        print("[zdiscord] Invalid arguments for GenerateRedeemCode.")
-    end
-end)
+        if source ~= 0 then
+            local invoker = GetInvokingResource()
+            if invoker ~= "zdiscord" then
+                return
+            end
+        end
+    
+        local usesNum = tonumber(uses)
+        local expArg  = tonumber(expiryFlexible) or expiryFlexible
+        local perUser = tonumber(perUserLimit)
+    
+        if itemsJson and usesNum and expArg ~= nil and customCode then
+            exports["midnight_redeem"]:GenerateRedeemCode(0, itemsJson, usesNum, expArg, customCode, perUser)
+            Debugprint(("Generated redeem code via zdiscord: uses=%s expiry=%s code=%s perUser=%s"):format(uses, tostring(expArg), customCode, tostring(perUser)))
+        else
+            Debugprint("[zdiscord] Invalid arguments for GenerateRedeemCode.")
+        end
+    end)
 
 lib.callback.register("midnight-redeem:getAllCodes", function(src)
     local src = source
@@ -591,6 +635,129 @@ RegisterServerEvent("midnight-redeem:updateCode", function(payload)
         end
     end)
 end)
+
+local function _parseDailyReward(entry)
+    if type(entry) == "table" then
+        if entry.money then
+            local amt = tonumber(entry.amount or 0) or 0
+            if amt > 0 then
+                local opt = (entry.option and tostring(entry.option):lower()) or "cash"
+                if opt ~= "cash" and opt ~= "bank" then opt = "cash" end
+                return { money = true, amount = amt, option = opt }
+            end
+        elseif entry.item then
+            local item = tostring(entry.item)
+            local amt  = tonumber(entry.amount or 0) or 0
+            if item ~= "" and amt > 0 then
+                return { item = item, amount = amt }
+            end
+        end
+        return nil
+    elseif type(entry) == "string" then
+        local left, right = entry:match("^%s*([^%.,:%s]+)[%.,:](%d+)%s*$")
+        if left and right then
+            local name = tostring(left)
+            local amt  = tonumber(right)
+            if not amt or amt <= 0 then return nil end
+            local lname = name:lower()
+            if lname == "cash" or lname == "bank" then
+                return { money = true, amount = amt, option = lname }
+            else
+                return { item = name, amount = amt }
+            end
+        end
+        return nil
+    end
+    return nil
+end
+
+function CreateDailyCode()
+    if not (Config and Config.DailyRewardEnabled) then
+        Debugprint("[midnight_redeem] Daily code generation disabled (Config.DailyRewardEnabled = false).")
+        return
+    end
+
+    local usesNum       = tonumber(Config.DailyRewarduses) or 1
+    local perUserLimit  = tonumber(Config.DailyRewardperuserlimit) or 1
+    local hoursNum      = tonumber(Config.DailyRewardhours) or 6
+
+    if usesNum <= 0 or perUserLimit < 0 or hoursNum <= 0 then
+        Debugprint("[midnight_redeem] Daily code skipped: invalid Config values (uses/perUserLimit/hours).")
+        return
+    end
+
+    local pickedReward = nil
+    if type(Config.DailyRewards) == "table" and #Config.DailyRewards > 0 then
+        local candidates = {}
+        for _, e in ipairs(Config.DailyRewards) do
+            local r = _parseDailyReward(e)
+            if r then table.insert(candidates, r) end
+        end
+        if #candidates > 0 then
+            local seedExtra = (GetGameTimer and GetGameTimer() or 0)
+            math.randomseed(os.time() + seedExtra)
+            pickedReward = candidates[math.random(#candidates)]
+        end
+    end
+
+    if not pickedReward then
+        local rewardName = tostring(Config.DailyRewardItem or "cash")
+        local amountNum  = tonumber(Config.DailyRewardamount) or 0
+        if amountNum <= 0 then
+            Debugprint("[midnight_redeem] Daily code skipped: no valid reward in Config.DailyRewards and fallback amount <= 0.")
+            return
+        end
+        local rn = rewardName:lower()
+        if rn == "cash" or rn == "bank" then
+            pickedReward = { money = true, amount = amountNum, option = rn }
+        else
+            pickedReward = { item = rewardName, amount = amountNum }
+        end
+    end
+
+    local itemsJson = json.encode({ pickedReward })
+
+    local expiryAbs = os.date("%Y-%m-%d %H:%M:%S", os.time() + (hoursNum * 3600))
+
+    local function _randCode(len)
+        local chars = "AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz123456789"
+        local out = {}
+        for i = 1, len do
+            local idx = math.random(#chars)
+            out[i] = chars:sub(idx, idx)
+        end
+        return table.concat(out)
+    end
+
+    local seedExtra = (GetGameTimer and GetGameTimer() or 0)
+    math.randomseed(os.time() + seedExtra)
+
+    local code
+    for _ = 1, 10 do
+        local candidate = ("D-%s-%s-%s"):format(todayKey, slotKey, _randCode(6))
+        local exists = MySQL.query.await('SELECT code FROM midnight_codes WHERE code = ? LIMIT 1', { candidate })
+        if not (exists and exists[1]) then
+            code = candidate
+            break
+        end
+    end
+    if not code then
+        code = ("D-%s-%s-%06d"):format(todayKey, slotKey, math.random(0, 999999))
+    end
+
+    HandleRedeemCode(0, itemsJson, usesNum, expiryAbs, code, perUserLimit, "Daily Code")
+
+    local expiryTs = (iso_to_unix and iso_to_unix(expiryAbs)) or (os.time() + (tonumber(Config.DailyRewardhours) or 0) * 3600)
+    local expiry   = expiryTs and (("<t:%d:f> (<t:%d:R>)"):format(expiryTs, expiryTs)) or "Never"
+    local codeFmt  = ("`%s`"):format(code)
+
+    SendToDiscord("🎁 Daily Reward Code", "Use this code today:", 3447003, {
+        fields = {
+            { name = "Redeem Code", value = codeFmt, inline = false },
+            { name = "Expiry",      value = expiry,  inline = false },
+        }
+    }, "daily")
+end
 
 RegisterCommand(Config.AdminCommand, function(source)
     local src = source

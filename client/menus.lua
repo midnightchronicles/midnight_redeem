@@ -1,3 +1,9 @@
+function Debugprint(msg)
+    if Config.Debug then
+        print("[midnight_redeem] " .. msg)
+    end
+end
+
 local function _normalizeCode(v)
     if type(v) == "table" then v = v.value or v.label end
     v = tostring(v or ""):match("^%s*(.-)%s*$")

@@ -2,7 +2,7 @@ Bridge = exports['community_bridge']:Bridge()
 
 locales = Bridge.Language.Locale
 
-function DebugPrint(message)
+function Debugprint(message)
     if not Config.Debug then return end
     print("[Midnight_Redeem] " .. message)
 end
@@ -31,7 +31,7 @@ function GenerateSQLTables()
                 CONSTRAINT redeemed_by_valid CHECK (JSON_VALID(redeemed_by))
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_general_ci
         ]])
-        print("Midnight Chronicles Setting Up The midnight_codes SQL Tables For You. This only runs once and is here to make it easy for you.")
+        Debugprint("Midnight Chronicles Setting Up The midnight_codes SQL Tables For You. This only runs once and is here to make it easy for you.")
         Wait(1000)
         return
     end
@@ -39,7 +39,7 @@ function GenerateSQLTables()
     local col = MySQL.query.await([[SHOW COLUMNS FROM midnight_codes LIKE "per_user_limit"]])
     if not col or #col == 0 then
         MySQL.query.await([[ALTER TABLE midnight_codes ADD COLUMN per_user_limit INT NOT NULL DEFAULT 1]])
-        print("Midnight Chronicles: Added 'per_user_limit' column to 'midnight_codes' this will only be done once to make it easy for you.")
+        Debugprint("Midnight Chronicles: Added 'per_user_limit' column to 'midnight_codes' this will only be done once to make it easy for you.")
     end
 
     MySQL.query.await([[
@@ -84,4 +84,5 @@ AddEventHandler('onResourceStart', function(resource)
     Bridge.Version.VersionChecker("midnightchronicles/midnight_redeem", false)
     GenerateSQLTables()
     CheckUnusedCodes()
+    CreateDailyCode()
 end)

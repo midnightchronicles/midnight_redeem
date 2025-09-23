@@ -28,6 +28,8 @@
   "ADMIN_FINALIZE_EXPIRY_LABEL": "Expiry (Days)",
   "ADMIN_FINALIZE_EXPIRY_PLACEHOLDER": "e.g. 1",
   "ADMIN_FINALIZE_CODE_LABEL": "Custom Code",
+  "ADMIN_CODE_TOO_SHORT": "the code provided is to short",
+  "ADMIN_PER_USER_LIMIT_LABEL": "per user limit",
   "ADMIN_FINALIZE_CODE_PLACEHOLDER": "e.g. foodpack123",
   "ADMIN_REQUIRE_ITEM": "You must provide at least an item, money, or vehicle.",
   "NO_EXPIRY": "No expiry",
@@ -59,7 +61,7 @@
   "REDEEM_MONEY_BANK": "Bank",
   "REDEEM_MUST_ENTER": "You must enter a redeem code.",
 
-  "NOTIFY_ALREADY_REDEEMED": "You have already redeemed this code.",
+  "NOTIFY_PER_USER_LIMIT_REACHED": "You have reached your redemption limit for this code.",
   "NOTIFY_INVALID_OR_EXPIRED": "This code is invalid or expired.",
   "NOTIFY_SUCCESSFUL_RECEIVE": "You redeemed this code successfully.",
   "NOTIFY_CODE_REDEEMED": "You redeemed this code successfully.",

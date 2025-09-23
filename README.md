@@ -48,10 +48,15 @@ ensure midnight_redeem
 Prompts the player to input their redeem code.
 
 ### Admin Command
-`/genredeem` (changeable in config)  
+`/adminredeem` (changeable in config)  
 Opens an input dialog for administrators to generate new redeem codes with comprehensive reward configurations.
 
 ---
+
+### cfg setr webhooks
+setr mredeem:webhook_default ""
+setr mredeem:webhook_daily ""
+setr mredeem:webhook_admin ""
 
 
 `/checkredeem` to check existing codes for there expiry, uses left, and what rewards they hold.
