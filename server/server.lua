@@ -231,20 +231,27 @@ RegisterServerEvent("midnight-redeem:generateCode", function(itemsJson, uses, ex
 end)
 
 local function addVehicleToGarage(model, playerName, uniqueId)
-    local currentFramework = GetFrameworkVersion()
+    local currentFramework = string.lower(GetFrameworkVersion() or "")
     if model then
         local plate = string.upper(string.sub(playerName or "PLR", 1, 3)) .. math.random(1000, 9999)
         local props = { model = model, plate = plate }
         local state, garage = 1, "pillbox"
+
         if currentFramework == "es_extended" then
+            print("[midnight_redeem] Using ESX")
             MySQL.query.await('INSERT INTO `owned_vehicles` (owner, plate, vehicle, stored) VALUES (?, ?, ?, ?)', {
-                uniqueId, plate, json_encode(props), state
+                uniqueId, plate, json.encode(props), state
             })
-        elseif currentFramework == "qb-core" then
+
+        elseif currentFramework == "qb-core" or currentFramework == "qbx_core" then
             MySQL.query.await('INSERT INTO `player_vehicles` (license, citizenid, vehicle, hash, mods, plate, state, garage) VALUES (?, ?, ?, ?, ?, ?, ?, ?)', {
-                uniqueId, uniqueId, model, GetHashKey(model), json_encode(props), plate, state, garage
+                uniqueId, uniqueId, model, GetHashKey(model), json.encode(props), plate, state, garage
             })
+
+        else
+            print("[midnight_redeem] Unknown framework: " .. tostring(currentFramework))
         end
+
         return plate
     end
 end
@@ -673,7 +680,7 @@ end
 
 function CreateDailyCode()
     if not (Config and Config.DailyRewardEnabled) then
-        Debugprint("[midnight_redeem] Daily code generation disabled (Config.DailyRewardEnabled = false).")
+        Debugprint("[midnight_redeem] Daily code generation disabled.")
         return
     end
 
@@ -682,7 +689,20 @@ function CreateDailyCode()
     local hoursNum      = tonumber(Config.DailyRewardhours) or 6
 
     if usesNum <= 0 or perUserLimit < 0 or hoursNum <= 0 then
-        Debugprint("[midnight_redeem] Daily code skipped: invalid Config values (uses/perUserLimit/hours).")
+        Debugprint("[midnight_redeem] Invalid Config values, skipping code creation.")
+        return
+    end
+
+    local todayKey  = os.date("%Y%m%d")
+    local slotKey   = os.date("%H")
+    local likeKey   = ("D-%s-%s-%%%%"):format(todayKey, slotKey)
+
+    local existsForSlot = MySQL.query.await(
+        'SELECT code FROM midnight_codes WHERE code LIKE ? LIMIT 1',
+        { likeKey }
+    )
+    if existsForSlot and existsForSlot[1] then
+        Debugprint("[midnight_redeem] Daily code already exists for this hour, skipping creation.")
         return
     end
 
@@ -704,7 +724,7 @@ function CreateDailyCode()
         local rewardName = tostring(Config.DailyRewardItem or "cash")
         local amountNum  = tonumber(Config.DailyRewardamount) or 0
         if amountNum <= 0 then
-            Debugprint("[midnight_redeem] Daily code skipped: no valid reward in Config.DailyRewards and fallback amount <= 0.")
+            Debugprint("[midnight_redeem] No valid reward, skipping code creation.")
             return
         end
         local rn = rewardName:lower()
@@ -716,6 +736,10 @@ function CreateDailyCode()
     end
 
     local itemsJson = json.encode({ pickedReward })
+    if not itemsJson then
+        Debugprint("[midnight_redeem] Invalid item data, cannot create code.")
+        return
+    end
 
     local expiryAbs = os.date("%Y-%m-%d %H:%M:%S", os.time() + (hoursNum * 3600))
 
@@ -729,8 +753,7 @@ function CreateDailyCode()
         return table.concat(out)
     end
 
-    local seedExtra = (GetGameTimer and GetGameTimer() or 0)
-    math.randomseed(os.time() + seedExtra)
+    math.randomseed(os.time() + (GetGameTimer and GetGameTimer() or 0))
 
     local code
     for _ = 1, 10 do
@@ -747,16 +770,19 @@ function CreateDailyCode()
 
     HandleRedeemCode(0, itemsJson, usesNum, expiryAbs, code, perUserLimit, "Daily Code")
 
-    local expiryTs = (iso_to_unix and iso_to_unix(expiryAbs)) or (os.time() + (tonumber(Config.DailyRewardhours) or 0) * 3600)
+    local expiryTs = (iso_to_unix and iso_to_unix(expiryAbs)) or (os.time() + hoursNum * 3600)
     local expiry   = expiryTs and (("<t:%d:f> (<t:%d:R>)"):format(expiryTs, expiryTs)) or "Never"
     local codeFmt  = ("`%s`"):format(code)
 
-    SendToDiscord("🎁 Daily Reward Code", "Use this code today:", 3447003, {
-        fields = {
+    SendToDiscord("🎁 Daily Reward Code",
+        ("Use this code for today's %s hour:"):format(slotKey),
+        3447003,
+        { fields = {
             { name = "Redeem Code", value = codeFmt, inline = false },
             { name = "Expiry",      value = expiry,  inline = false },
-        }
-    }, "daily")
+        }},
+        "daily"
+    )
 end
 
 RegisterCommand(Config.AdminCommand, function(source)

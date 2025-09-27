@@ -2,7 +2,7 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-version '1.1.7' 
+version '1.1.8' 
 description 'Redeem System'
 author 'Midnight Chronicles'
 
