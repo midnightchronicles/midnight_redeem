@@ -134,3 +134,8 @@ amount: this has to be in order so if you wanted to do 5 water 10 sandwiches and
 if updating after 8/6/2025 you will need to add the following to your SQL:
 ALTER TABLE midnight_codes ADD COLUMN expired_notified TINYINT(1) DEFAULT 0;
 ```
+
+## support discord
+--
+https://discord.gg/8YpYsafebn
+--
