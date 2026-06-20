@@ -1,141 +1,275 @@
-# 🎁 Midnight Redeem System 
+# Midnight Redeem
 
-A **simple and flexible redeem system** designed for one-off giveaways, player refunds, or event-based rewards. This system leverages input dialogs for a seamless user experience.
+> A modern, escrow-friendly FiveM redeem system with a live admin dashboard, automated daily rewards, permissions, logging, and optional AI-assisted code generation.
 
-Easily customizable and highly adaptable, Midnight Redeem System supports various frameworks, inventory systems, notifications, and menus through its **Community Bridge** integration.
+## Features
+- Single-use, multi-use, unlimited, and scheduled redeem codes.
+- Rewards for items, money, vehicles, or mixed bundles.
+- Live admin dashboard with search, templates, statistics, permissions, and transcript tools.
+- Automated daily rewards with configurable cadence and per-user limits.
+- Owner / manager / staff permission system with framework-admin onboarding support.
+- Discord and FiveManage logging with route-based webhooks and SDK fallback support.
+- Version checker powered by `fxmanifest.lua` and GitHub releases.
+- 23 locale packs, persistent theme settings, and a configurable content filter.
+- Optional Shadow AI assistant for generating reward setups faster.
 
----
+## Requirements
+- Latest FiveM server artifact with `fx_version 'cerulean'`
+- Lua 5.4
+- [`oxmysql`](https://github.com/overextended/oxmysql)
+- [`ox_lib`](https://github.com/overextended/ox_lib)
+- [`community_bridge`](https://github.com/The-Order-Of-The-Sacred-Framework/community_bridge)
 
-## ✨ Features
+## Optional Integrations
+- [`fmsdk`](https://docs.fivemanage.com/sdk/fivem/logs) for native FiveManage logging support
+- [`zdiscord`](https://github.com/zfbx/zdiscord) for the bundled `/generateredeem` Discord command
 
-### 🔐 **Code Restrictions**  
-Implement usage limits for your redeem codes. Each code can be configured for a specific number of uses, and critically, each player can redeem a code **only once**, ensuring fairness and preventing abuse.
+## Installation
+1. Place `midnight_redeem` inside your server's resources folder.
+2. Make sure dependencies start before this resource:
 
-### 📆 **Expiry System (SQL-based)**  
-Define the active lifespan of your redeem codes. Expiration is managed in **real-time** directly through your SQL database, providing precise control over code availability.
-
-### 🎒 **Custom Rewards**  
-Offer a diverse range of rewards to your players:
-- 🎁 **Item Rewards:** Distribute in-game items with specified quantities (`item`, `amount`).
-- 💵 **Money Rewards:** Grant in-game currency, with options for cash or bank deposits (`money`, `amount`, `option`).
-- 🚗 **Vehicle Rewards:** Provide players with specific vehicles (`vehicle`, `model`).
-- **Combined Rewards:** Create complex reward codes that combine multiple reward types simultaneously.
-
-### ⚙️ **Bridge Integration**  
-Fully compatible with [Community Bridge](https://github.com/The-Order-Of-The-Sacred-Framework/community_bridge), offering extensive flexibility:
-- **Notification Systems:** Integrate with your preferred notification system.
-- **Input Dialogs/Menus:** Utilize any input dialog or menu system for player interactions.
-- **Inventory Systems:** Seamlessly connect with your existing inventory management.
-- **Framework Agnostic:** Adaptable to your preferred server framework.
-
----
-
-## 🔧 Dependencies
-
-[Community Bridge](https://github.com/The-Order-Of-The-Sacred-Framework/community_bridge)
-
-**Ensure these resources are started `before` `midnight_redeem`:**
-```
+```cfg
 ensure ox_lib
-ensure your_core          # Replace with your core resource (e.g., es_extended, qb-core)
-ensure your_inventory     # Replace with your inventory resource (e.g., ox_inventory, qb-inventory)
+ensure oxmysql
 ensure community_bridge
 ensure midnight_redeem
 ```
 
-### Player Command
-`/redeemcode` (changeable in config)  
-Prompts the player to input their redeem code.
+Start your framework and inventory resources in the correct order for your `community_bridge` setup.
 
-### Admin Command
-`/adminredeem` (changeable in config)  
-Opens an input dialog for administrators to generate new redeem codes with comprehensive reward configurations.
+3. Add Discord and FiveManage logging convars to `server.cfg`:
 
----
+```cfg
+# Midnight Redeem logging
+setr mredeem:webhook_default "https://discord.com/api/webhooks/..."
+setr mredeem:webhook_admin   "https://discord.com/api/webhooks/..."
+setr mredeem:webhook_daily   "https://discord.com/api/webhooks/..."
+setr FIVEMANAGE_LOGS_API_KEY "your_fivemanage_key"   # optional fallback for direct API
+```
 
-### cfg setr webhooks
-setr mredeem:webhook_default ""
-setr mredeem:webhook_daily ""
-setr mredeem:webhook_admin ""
+4. If you want to use Shadow AI, add the AI convars to `server.cfg`:
 
+```cfg
+# Midnight Redeem - Shadow AI
+set MREDEEM_AI_API_KEY    "sk-..."
+set MREDEEM_AI_PROVIDER   "openai"
+set MREDEEM_AI_MODEL      "gpt-4.1-mini"
+set MREDEEM_AI_WEB_SEARCH "1"   # 1 = enable web search, 0 = disable
+```
 
-`/checkredeem` to check existing codes for there expiry, uses left, and what rewards they hold.
+5. Start the server once, or run `refresh` followed by `ensure midnight_redeem`, so the resource can create and migrate all `midnight_*` database tables automatically.
+6. Review and customize configuration:
+- **In-game (owners):** Settings → **Config** tab — edit general settings, daily rewards, prefilled templates, and content filter at runtime (saved to the database, persists across restarts).
+- **`server/runtime_config.lua`** — factory defaults embedded at the top of this file; written to the database on first resource start. After that the database is the source of truth.
+- **`server/permissions.lua`** — owner identifiers, permission model, and default role behavior.
+7. Optional: copy `zdiscord_command_file/generateredeem.js` into `zdiscord/server/commands/` if you want staff to generate codes from Discord.
+8. Restart `midnight_redeem` after changing embedded defaults in `runtime_config.lua` or `permissions.lua`. Most other settings can be changed live from the Config tab.
 
----
+> The resource masks webhook URLs in debug output and prints which FiveManage path is active during startup.
 
-## 🧩 Reward Fields Explained
-When creating a reward code, configure these fields to define its properties and rewards:
+## Quick Start
+1. Add your owner identifiers to `server/permissions.lua`.
+2. Start the resource.
+3. Join the server with a listed owner account.
+4. Run `/midnight_admin_init` once to seed your first owner entry.
+5. Open the admin panel with `/adminredeem`.
 
-| Field         | Description                                        | Example                           |
-| :------------ | :------------------------------------------------- | :-------------------------------- |
-| `item`        | The name of the inventory item to be given.        | `"water"`, `"repair_kit"`         |
-| `amount`      | The quantity of the item or money to be granted.   | `5`, `1000`                       |
-| `money`       | Set to `true` if this reward is in-game currency.  | `"money": true`                   |
-| `option`      | Specifies the money type: `"cash"` or `"bank"`.    | `"option": "cash"`                |
-| `vehicle`     | Set to `true` if this reward is a vehicle.         | `"vehicle": true`                 |
-| `model`       | The model name of the vehicle to be spawned.       | `"model": "adder"`                |
-| `uses`        | The maximum number of times the code can be used in total. | `"3"`                     |
-| `days`        | The number of days the code remains valid from creation. | `"7"`                     |
-| `custom code` | The actual string or code that players will enter to redeem. | `"GIFT2025"`              |
+## ACE Permissions
+`midnight_redeem` now checks `community_bridge` admin status first and falls back to ACE if framework admin detection returns false or fails. This is useful for Qbox setups and mixed permission environments.
 
----
+Add this line to `server.cfg` or, if you manage ACEs separately on Qbox, to `permissions.cfg`:
 
-## 📄 Usage Examples
+```cfg
+add_ace group.admin midnight_redeem.admin allow
+```
 
-### Basic Example
-This example demonstrates generating a redeem code with items, money, and a vehicle reward, limited to 3 uses and valid for 7 days.
+Then make sure your admins are actually in that ACE group, for example:
+
+```cfg
+add_principal identifier.license:YOUR_LICENSE_HERE group.admin
+```
+
+Notes:
+- With `REQUIRE_PERMISSION = false`, any player recognized by `community_bridge` or ACE can use admin-only Midnight Redeem actions.
+- With `REQUIRE_PERMISSION = true`, `community_bridge` or ACE can get the player through the admin gate, and Midnight Redeem's own role system still controls actions such as `/redeemrole`, delete permissions, and other manager/owner features.
+- For Qbox servers, put the ACE in whichever file you already use for your permission principals. Many servers use `permissions.cfg`.
+
+## Configuration
+
+### Runtime config (in-game)
+Owners can open **Settings → Config** and edit live settings in four sub-tabs. Changes are stored in the `midnight_runtime_config` database table.
+
+| Tab | What it controls |
+|-----|------------------|
+| **General** | Debug, framework, commands, SQL cleanup, dashboard refresh, logging |
+| **Daily Rewards** | Enable flag, reward times, uses, per-user limit, window hours, rotation JSON |
+| **Prefilled** | Reward categories, quick templates, and AI code templates (JSON) |
+| **Content Filter** | Blocked words by category |
+
+**Chat Settings** (same section, owner-only) controls Shadow AI enable flag, rate limits, transcript retention, welcome message, and transcript maintenance actions.
+
+Provider, model, and web search remain in `server.cfg` (`MREDEEM_AI_*` convars).
+
+### `server/runtime_config.lua`
+Factory defaults are embedded at the top of this file and written to `midnight_runtime_config` on first start. After seeding, edit config in-game or in the database. Use **Reset Tab to Defaults** in the Config UI to restore a section to the embedded factory values.
+
+To change factory defaults for new installs, edit the embedded `Config.*` block near the top of `runtime_config.lua` (before the database helpers).
+
+### `server/permissions.lua`
+- Add your owner identifiers to `OWNER_LICENSES`.
+- Set `REQUIRE_PERMISSION = false` if you want to trust `community_bridge` admin detection or ACE (`midnight_redeem.admin`) instead of the built-in RBAC system.
+- Set `DEFAULT_ROLE` to the role that framework admins or ACE admins should receive on first access.
+- Adjust `PERMISSION_ACTIONS_CONFIG` to control who can use each protected action.
+
+Example:
 
 ```lua
+REQUIRE_PERMISSION = true
+
+DEFAULT_ROLE = "staff"
+
+PERMISSION_ACTIONS_CONFIG = {
+    CREATE_CODES = { "owner", "manager", "staff" },
+    EDIT_CODES = { "owner", "manager" },
+    DELETE_CODES = { "owner", "manager" },
+    BULK_DELETE = { "owner", "manager" },
+    VIEW_DASHBOARD = { "owner", "manager", "staff" },
+    VIEW_TRANSCRIPTS = { "owner", "manager", "staff" },
+    MANAGE_PERMISSIONS = { "owner", "manager" },
+    COLOR_SETTINGS = { "owner", "manager", "staff" },
+    FULL_ACCESS = { "owner" }
+}
+```
+---
+side note all admins will auto get assigned with the staff role
+---
+
+## Logging
+- `SendToDiscord` routes logs to `mredeem:webhook_default`, `mredeem:webhook_admin`, or `mredeem:webhook_daily`.
+- If `fmsdk` is available, FiveManage logging uses the SDK automatically.
+- If `fmsdk` is not available, the resource falls back to `FIVEMANAGE_LOGS_API_KEY`.
+- Daily reward announcements always use the `daily` Discord webhook.
+
+## Version Checking
+- The installed version is read directly from `fxmanifest.lua`.
+- On startup, the resource checks the latest GitHub release.
+- Three states are supported: up to date, update available, and ahead of public release.
+- The installed version is shown in the UI and in startup console output.
+
+## Commands
+
+| Command | Access | Description |
+| --- | --- | --- |
+| `/redeemcode` | All players | Opens the player redeem prompt. |
+| `/adminredeem` | Staff+ or framework admins | Opens the Midnight Redeem admin dashboard. |
+| `/midnight_admin_init` | Listed owners only | Seeds the first owner record for your server. |
+| `/redeemrole <player_id> <role>` | Manager+ | Changes a player's role. |
+| `/checkowner` | Any player | Checks whether your identifier is listed as an owner. |
+| `/refreshdashboard` | Console or trusted admin | Forces a dashboard cache refresh and pushes updated stats to open UIs. |
+| `/mrperf` | Console or staff | Prints performance and cache metrics. |
+| `cleanupcodes` | Server console | Removes expired codes older than the configured retention window. |
+| `clearcodes` | Server console | Deletes all codes from the database. |
+
+## Exports
+
+All server exports are available through `exports['midnight_redeem']:<ExportName>(...)`.
+
+### `GenerateRedeemCode`
+Creates a redeem code programmatically from another resource or automation.
+
+```lua
+local rewards = json.encode({
+    { item = "credit_voucher", amount = 1 },
+    { money = true, amount = 5000, option = "bank" }
+})
+
 exports['midnight_redeem']:GenerateRedeemCode(
-    source,
-    '[{"item":"bread","amount":5},{"money":true,"amount":1000,"option":"cash"},{"vehicle":true,"model":"adder"}]',
-    "3",        -- Max uses
-    "7",        -- Expiry in days
-    "GIFT2025"  -- Custom code
+    0,            -- source (0 for server-side automation)
+    rewards,      -- rewards JSON
+    10,           -- uses
+    7,            -- expiry days or "Never"
+    "FINANCE2025",
+    1,            -- optional per-user limit
+    "Automation", -- optional createdBy override
+    nil,          -- optional time restrictions
+    nil           -- optional player restriction
 )
 ```
 
-### Dynamic From User Input
-This example illustrates how to dynamically generate a redeem code based on user-provided inputs, such as player ID, reward structure, uses, expiry, and the custom code itself.
+### `hasPermission`
+Checks whether a player can perform an action such as `CREATE_CODES` or `MANAGE_PERMISSIONS`.
 
 ```lua
-local playerId = source
-local code = userProvidedCode
-local uses = tostring(userProvidedUses)
-local expiry = tostring(userProvidedDays)
-local rewardsJson = json.encode(userProvidedRewards)
-
-exports['midnight_redeem']:GenerateRedeemCode(
-    source,         -- player ID
-    rewardsJson,    -- reward structure (items, cash, etc.)
-    uses,           -- max uses
-    expiry,         -- expiry in days
-    code            -- redeem code
-)
-```
-## zdiscord integration
-
-```
-go to 'midnight_redeem/zdiscord_command_file' folder and copy generateredeem.js file
-go to zdicord/server/commands and paste the file into the folder
-make sure zdiscord is started after midnight_redeem
-restart server
-good to go :)
-/generateredeem
+if exports['midnight_redeem']:hasPermission(source, "MANAGE_PERMISSIONS") then
+    -- permitted
+end
 ```
 
-```
-you can only do upto 10 items due to discords own limitations
-itemnames: can be done single `water` or multiple like `water, sandwich, phone'
-amount: this has to be in order so if you wanted to do 5 water 10 sandwiches and 1 phone youd do like this: '5, 10, 1' in the order you done the itemnames option
+### `getUserRole`
+Returns the caller's saved role.
+
+```lua
+local role = exports['midnight_redeem']:getUserRole(source) or "staff"
 ```
 
-```
-if updating after 8/6/2025 you will need to add the following to your SQL:
-ALTER TABLE midnight_codes ADD COLUMN expired_notified TINYINT(1) DEFAULT 0;
+### `getUserPermissionLevel`
+Returns the numeric permission tier for the caller.
+
+```lua
+local level = exports['midnight_redeem']:getUserPermissionLevel(source) or 0
 ```
 
-## support discord
---
-https://discord.gg/8YpYsafebn
---
+### `setUserRole`
+Updates a player's role after permission checks pass.
+
+```lua
+local success, message = exports['midnight_redeem']:setUserRole(source, targetPlayer, "manager")
+```
+
+### `grantOwnerPermission`
+Used by `/midnight_admin_init`, but can also be called from your own setup tooling.
+
+```lua
+local ok, err = exports['midnight_redeem']:grantOwnerPermission(source)
+```
+
+### `removeUserPermissions`
+Deletes a stored permission record.
+
+```lua
+exports['midnight_redeem']:removeUserPermissions(source)
+```
+
+### `getAllUserPermissions`
+Returns all stored permission entries used by the dashboard.
+
+```lua
+local users = exports['midnight_redeem']:getAllUserPermissions()
+```
+
+### Configuration exports from `server/permissions.lua`
+- `GetOwnerLicenses()`
+- `GetRequirePermission()`
+- `GetDefaultRole()`
+- `GetPermissionActionsConfig()`
+
+> Client exports: none. The UI communicates through callbacks and events.
+
+## UI Overview
+- Dashboard statistics for total, active, expired, and fully redeemed codes
+- Code creation, editing, bulk delete, and template workflows
+- Permission management with search and role editing
+- Daily reward management and monitoring
+- Shadow AI chat, transcript browsing, and version information
+- Theme and locale preferences stored in the NUI
+
+## Optional Discord Command
+If you use `zdiscord`:
+
+1. Copy `zdiscord_command_file/generateredeem.js` into `zdiscord/server/commands/`.
+2. Ensure `zdiscord` starts after `midnight_redeem`.
+3. Reload both resources or restart the server.
+4. Use `/generateredeem` in Discord.
+
+## Support
+[Join the support Discord](https://discord.gg/8YpYsafebn)

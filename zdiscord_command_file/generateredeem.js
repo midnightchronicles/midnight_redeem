@@ -1,4 +1,4 @@
-module.exports = {
+﻿module.exports = {
     name: "generateredeem",
     description: "Generate a redeem code for items, money, and vehicles.",
     role: "mod",
@@ -60,6 +60,12 @@ module.exports = {
             required: false,
             type: "INTEGER",
         },
+        {
+            name: "peruserlimit",
+            description: "Times each player can redeem (0 for unlimited).",
+            required: false,
+            type: "INTEGER",
+        },
     ],
 
     run: async (client, interaction, args) => {
@@ -68,8 +74,9 @@ module.exports = {
         for (let i = 1; i <= 10; i++) {
             const itemName = args[`itemname${i}`];
             const itemAmount = args[`itemamount${i}`];
-            if (itemName && itemAmount && !isNaN(itemAmount) && itemAmount > 0) {
-                rewards.push({ item: itemName.trim(), amount: parseInt(itemAmount) });
+            const parsedAmount = parseInt(itemAmount, 10);
+            if (itemName && !Number.isNaN(parsedAmount) && parsedAmount > 0) {
+                rewards.push({ item: itemName.trim(), amount: parsedAmount });
             }
         }
 
@@ -84,15 +91,18 @@ module.exports = {
             }
             for (let i = 0; i < items.length; i++) {
                 const item = items[i].trim();
-                const amount = parseInt(amounts[i].trim());
-                if (item && !isNaN(amount) && amount > 0) {
-                    rewards.push({ item: item, amount: amount });
+                const amount = parseInt(amounts[i].trim(), 10);
+                if (item && !Number.isNaN(amount) && amount > 0) {
+                    rewards.push({ item, amount });
                 }
             }
         }
 
-        if (args.moneyamount && parseInt(args.moneyamount) > 0) {
-            rewards.push({ money: true, amount: parseInt(args.moneyamount) });
+        if (args.moneyamount) {
+            const moneyAmount = parseInt(args.moneyamount, 10);
+            if (!Number.isNaN(moneyAmount) && moneyAmount > 0) {
+                rewards.push({ money: true, amount: moneyAmount, option: "cash" });
+            }
         }
 
         if (args.vehicle && args.vehicle.trim() !== "") {
@@ -105,7 +115,13 @@ module.exports = {
                 ephemeral: true,
             });
         }
-        if (isNaN(args.uses) || isNaN(args.expiry) || !args.customcode) {
+        const uses = parseInt(args.uses, 10);
+        const expiryDays = parseInt(args.expiry, 10);
+        const perUserRaw = args.peruserlimit !== undefined ? parseInt(args.peruserlimit, 10) : 1;
+        const perUserLimit = !Number.isNaN(perUserRaw) && perUserRaw >= 0 ? perUserRaw : 1;
+        const customCode = (args.customcode || "").trim();
+
+        if (Number.isNaN(uses) || uses <= 0 || Number.isNaN(expiryDays) || !customCode) {
             return interaction.reply({
                 content: "Invalid uses, expiry, or code.",
                 ephemeral: true,
@@ -113,16 +129,12 @@ module.exports = {
         }
 
         const itemsJson = JSON.stringify(rewards);
-        const uses = parseInt(args.uses);
-        const expiryDays = parseInt(args.expiry);
-        const customCode = args.customcode;
-
-        emit("zdiscord:generateRedeemCode", itemsJson, uses, expiryDays, customCode);
+        emit("zdiscord:generateRedeemCode", itemsJson, uses, expiryDays, customCode, perUserLimit);
 
         let description = `✅ Your redeem code: \`${customCode}\`\n`;
         for (const reward of rewards) {
             if (reward.item) {
-                description += `📦 Item: **${reward.item}**\n🔢 Amount: **${reward.amount}**\n`;
+                description += `📦 Item: **${reward.item}**\n⚙️ Amount: **${reward.amount}**\n`;
             }
             if (reward.money) {
                 description += `💰 Money: **${reward.amount}**\n`;
@@ -131,7 +143,9 @@ module.exports = {
                 description += `🚗 Vehicle: **${reward.model}**\n`;
             }
         }
-        description += `♻️ Uses: **${uses}**\n📅 Expires in: **${expiryDays} days**`;
+        const expiryLine = expiryDays > 0 ? `${expiryDays} days` : "No expiry";
+        const perUserLine = perUserLimit === 0 ? "Unlimited" : perUserLimit;
+        description += `♻️ Uses: **${uses}**\n👤 Per user: **${perUserLine}**\n📅 Expires in: **${expiryLine}**`;
 
         return interaction.reply({
             embeds: [{

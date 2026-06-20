@@ -1,0 +1,3692 @@
+<!doctype html>
+<html lang="en" class="hidden">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta http-equiv="Permissions-Policy" content="clipboard-write=(self), clipboard-read=(self)">
+  <title>Midnight Redeem</title>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css?v=271">
+  <script src="https://kit.fontawesome.com/d1ca9ba610.js" crossorigin="anonymous"></script>
+</head>
+  <body>
+    <div id="app">
+    <div id="toast-root"></div>
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <span class="logo"><i class="fas fa-gift"></i></span>
+        <div>
+                  <div class="brand-title">Midnight Redeem</div>
+        <div class="brand-sub" data-locale="ADMIN_MENU_TITLE">Admin Dashboard</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-route="admin-dashboard">
+          <span class="dot"></span> <span data-locale="UI_SIDEBAR_DASHBOARD">Dashboard</span>
+        </button>
+        <button class="nav-item" data-route="create-code">
+          <span class="dot"></span> <span data-locale="UI_SIDEBAR_CREATE_CODE">Create Code</span>
+        </button>
+        <button class="nav-item" data-route="ai-generation">
+          <span class="dot"></span> <span data-locale="UI_SIDEBAR_AI_GENERATION">AI Generation</span>
+        </button>
+        <button class="nav-item" data-route="admin-codes">
+          <span class="dot"></span> <span data-locale="UI_SIDEBAR_SEARCH_CODES">Search Codes</span>
+        </button>
+        <button class="nav-item" data-route="admin-settings">
+          <span class="dot"></span> <span data-locale="UI_SIDEBAR_SETTINGS">Settings</span>
+        </button>
+      </nav>
+
+      <div class="grow"></div>
+
+      <div class="sidebar-footer">
+        <button id="closeBtn" class="btn btn-danger btn-xs" data-locale="UI_SIDEBAR_CLOSE">Close</button>
+        <div class="ver" id="sidebarVersion">v—</div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="crumbs" id="breadcrumbs" data-locale="UI_BREADCRUMBS_DASHBOARD">Admin / Dashboard</div>
+        <div class="actions">
+          <button class="btn" id="themeToggle" title="Toggle Dark/Light Mode">
+            <span class="icon"><i class="fas fa-moon"></i></span>
+            <span class="theme-label" data-locale="UI_THEME_TOGGLE_DARK">Dark</span>
+          </button>
+
+          <button class="btn" id="refreshBtn"><span data-locale="ADMIN_MENU_ACTION_MANAGE">Refresh</span></button>
+        </div>
+      </header>
+
+      <section id="route-admin-dashboard" class="route route-active">
+
+        <div class="panel weekly-stats-panel">
+          <div class="panel-title" data-locale="UI_DASHBOARD_WEEKLY_STATS">Weekly Statistics</div>
+          <div class="weekly-stats-container">
+            <div class="weekly-stat-item stat-simple">
+              <div class="stat-icon"><i class="fas fa-chart-bar"></i></div>
+              <div class="stat-content">
+                <div class="stat-label" data-locale="UI_DASHBOARD_CODES_GENERATED">Codes Generated</div>
+                <div class="stat-subtitle" data-locale="UI_DASHBOARD_LAST_2_WEEKS">Last 2 Weeks</div>
+                <div class="stat-value" id="weeklyCodesGenerated">-</div>
+              </div>
+            </div>
+            <div class="weekly-stat-item stat-simple">
+              <div class="stat-icon"><i class="fas fa-calendar-week"></i></div>
+              <div class="stat-content">
+                <div class="stat-label" data-locale="UI_DASHBOARD_LAST_WEEK">Last Week</div>
+                <div class="stat-value" id="weeklyLastWeekTickets">-</div>
+              </div>
+            </div>
+            <div class="weekly-stat-item stat-simple">
+              <div class="stat-icon"><i class="fas fa-calendar-day"></i></div>
+              <div class="stat-content">
+                <div class="stat-label" data-locale="UI_DASHBOARD_THIS_WEEK">This Week</div>
+                <div class="stat-value" id="weeklyThisWeekTickets">-</div>
+                <div class="stat-change" id="weeklyThisWeekChange">
+                  <span class="change-icon">-</span>
+                  <span class="change-text">-</span>
+                </div>
+              </div>
+            </div>
+            <div class="weekly-stat-item stat-simple">
+              <div class="stat-icon"><i class="fas fa-bullseye"></i></div>
+              <div class="stat-content">
+                <div class="stat-label" data-locale="UI_DASHBOARD_ACTIVE_CODES">Active Codes</div>
+                <div class="stat-value" id="weeklyActiveCodes">-</div>
+              </div>
+            </div>
+            <div class="weekly-stat-item">
+              <div class="stat-icon"><i class="fas fa-clock"></i></div>
+              <div class="stat-content">
+                <div class="stat-label" data-locale="UI_DASHBOARD_EXPIRED">Expired</div>
+                <div class="stat-value" id="weeklyExpiredCodes">-</div>
+                <div class="stat-comparison">
+                  <div class="comparison-label" data-locale="UI_DASHBOARD_LAST_WEEK">Last Week</div>
+                  <div class="comparison-value" id="weeklyExpiredLastWeek">-</div>
+                  <div class="stat-change" id="weeklyExpiredChange">
+                    <span class="change-icon">-</span>
+                    <span class="change-text">-</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="weekly-stat-item">
+              <div class="stat-icon"><i class="fas fa-check"></i></div>
+              <div class="stat-content">
+                <div class="stat-label" data-locale="UI_DASHBOARD_REDEEMED">Redeemed</div>
+                <div class="stat-value" id="weeklyRedeemedCodes">-</div>
+                <div class="stat-comparison">
+                  <div class="comparison-label" data-locale="UI_DASHBOARD_LAST_WEEK">Last Week</div>
+                  <div class="comparison-value" id="weeklyRedeemedLastWeek">-</div>
+                  <div class="stat-change" id="weeklyRedeemedChange">
+                    <span class="change-icon">-</span>
+                    <span class="change-text">-</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel daily-trends-panel">
+          <div class="panel-title" data-locale="UI_DASHBOARD_DAILY_TRENDS">Daily Generation Trends</div>
+          <div class="daily-trends-container">
+            <div class="daily-trend-item" data-day="monday">
+              <div class="day-label" data-locale="UI_DASHBOARD_MONDAY">Mon</div>
+              <div class="day-stats">
+                <div class="day-count" id="mondayCount">-</div>
+                <div class="day-change" id="mondayChange">
+                  <span class="change-icon">-</span>
+                  <span class="change-text">-</span>
+                </div>
+                <div class="day-previous" id="mondayPrevious">-</div>
+              </div>
+            </div>
+            <div class="daily-trend-item" data-day="tuesday">
+              <div class="day-label" data-locale="UI_DASHBOARD_TUESDAY">Tue</div>
+              <div class="day-stats">
+                <div class="day-count" id="tuesdayCount">-</div>
+                <div class="day-change" id="tuesdayChange">
+                  <span class="change-icon">-</span>
+                  <span class="change-text">-</span>
+                </div>
+                <div class="day-previous" id="tuesdayPrevious">-</div>
+              </div>
+            </div>
+            <div class="daily-trend-item" data-day="wednesday">
+              <div class="day-label" data-locale="UI_DASHBOARD_WEDNESDAY">Wed</div>
+              <div class="day-stats">
+                <div class="day-count" id="wednesdayCount">-</div>
+                <div class="day-change" id="wednesdayChange">
+                  <span class="change-icon">-</span>
+                  <span class="change-text">-</span>
+                </div>
+                <div class="day-previous" id="wednesdayPrevious">-</div>
+              </div>
+            </div>
+            <div class="daily-trend-item" data-day="thursday">
+              <div class="day-label" data-locale="UI_DASHBOARD_THURSDAY">Thu</div>
+              <div class="day-stats">
+                <div class="day-count" id="thursdayCount">-</div>
+                <div class="day-change" id="thursdayChange">
+                  <span class="change-icon">-</span>
+                  <span class="change-text">-</span>
+                </div>
+                <div class="day-previous" id="thursdayPrevious">-</div>
+              </div>
+            </div>
+            <div class="daily-trend-item" data-day="friday">
+              <div class="day-label" data-locale="UI_DASHBOARD_FRIDAY">Fri</div>
+              <div class="day-stats">
+                <div class="day-count" id="fridayCount">-</div>
+                <div class="day-change" id="fridayChange">
+                  <span class="change-icon">-</span>
+                  <span class="change-text">-</span>
+                </div>
+                <div class="day-previous" id="fridayPrevious">-</div>
+              </div>
+            </div>
+            <div class="daily-trend-item" data-day="saturday">
+              <div class="day-label" data-locale="UI_DASHBOARD_SATURDAY">Sat</div>
+              <div class="day-stats">
+                <div class="day-count" id="saturdayCount">-</div>
+                <div class="day-change" id="saturdayChange">
+                  <span class="change-icon">-</span>
+                  <span class="change-text">-</span>
+                </div>
+                <div class="day-previous" id="saturdayPrevious">-</div>
+              </div>
+            </div>
+            <div class="daily-trend-item" data-day="sunday">
+              <div class="day-label" data-locale="UI_DASHBOARD_SUNDAY">Sun</div>
+              <div class="day-stats">
+                <div class="day-count" id="sundayCount">-</div>
+                <div class="day-change" id="sundayChange">
+                  <span class="change-icon">-</span>
+                  <span class="change-text">-</span>
+                </div>
+                <div class="day-previous" id="sundayPrevious">-</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel rewards-stats-panel">
+          <div class="panel-title" data-locale="UI_DASHBOARD_MOST_POPULAR">Most Popular Redeemed <span class="top3-badge"><i class="fas fa-trophy"></i> <span data-locale="UI_DASHBOARD_TOP_3">TOP 3</span></span></div>
+          <div class="rewards-stats-container">
+            <div class="rewards-category">
+              <div class="category-title"><i class="fas fa-dollar-sign"></i> <span data-locale="UI_DASHBOARD_MONEY">Money</span></div>
+              <div class="rewards-list" id="topMoneyRewards">
+                <div class="reward-item">
+                  <div class="reward-name">Loading...</div>
+                  <div class="reward-count">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="rewards-category">
+              <div class="category-title"><i class="fas fa-box"></i> <span data-locale="UI_DASHBOARD_ITEMS">Items</span></div>
+              <div class="rewards-list" id="topItemRewards">
+                <div class="reward-item">
+                  <div class="reward-name">Loading...</div>
+                  <div class="reward-count">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="rewards-category">
+              <div class="category-title"><i class="fas fa-car"></i> <span data-locale="UI_DASHBOARD_VEHICLES">Vehicles</span></div>
+              <div class="rewards-list" id="topVehicleRewards">
+                <div class="reward-item">
+                  <div class="reward-name">Loading...</div>
+                  <div class="reward-count">-</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="recent-activity-title" data-locale="UI_DASHBOARD_RECENT_ACTIVITY">Recent Activity</div>
+          <div class="table-headers">
+            <div class="header-code" data-locale="UI_DASHBOARD_HEADER_CODE">CODE</div>
+            <div class="header-uses" data-locale="UI_DASHBOARD_HEADER_USES">USES</div>
+            <div class="header-status" data-locale="UI_DASHBOARD_HEADER_STATUS">STATUS</div>
+            <div class="header-creator" data-locale="UI_DASHBOARD_HEADER_CREATOR">CREATOR</div>
+            <div class="header-created" data-locale="UI_DASHBOARD_HEADER_CREATED">CREATED</div>
+            <div class="header-edited" data-locale="UI_DASHBOARD_HEADER_EDITED">EDITED</div>
+            <div class="header-expiry" data-locale="UI_DASHBOARD_HEADER_EXPIRY">EXPIRY</div>
+            <div class="header-space"></div>
+            <div class="header-space"></div>
+          </div>
+          <div class="recent-activity-container">
+            <ul id="recentList" class="list scrollable"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section id="route-create-code" class="route">
+        <div class="panel">
+          <div class="panel-title">Create New Code</div>
+          <div class="panel-content">
+              <p>Use our wizard to create codes quickly and easily</p>
+            <button class="btn btn-primary btn-lg" id="openWizardBtn">
+                <span class="icon"><i class="fas fa-magic"></i></span>
+                Generate Code
+              </button>
+            </div>
+          </div>
+      </section>
+
+
+      <section id="route-ai-generation" class="route">
+        <div class="panel">
+          <div class="panel-title" data-locale="UI_SHADOW_TITLE">AI Generation - Shadow</div>
+          <div id="shadowRulesPage" class="shadow-rules-page">
+            <div class="shadow-rules-header">
+              <div class="shadow-rules-avatar"><i class="fas fa-robot"></i></div>
+              <div>
+                <h3 data-locale="UI_SHADOW_WELCOME_TITLE">Meet Shadow</h3>
+                <p data-locale="UI_SHADOW_WELCOME_DESC">Your assistant for creating, finding, and updating redeem codes.</p>
+              </div>
+            </div>
+            <div class="shadow-rules-list">
+              <div class="shadow-rule-item"><strong>1.</strong> <span data-locale="UI_SHADOW_RULE_1">Stay focused on redeem-code tasks.</span></div>
+              <div class="shadow-rule-item"><strong>2.</strong> <span data-locale="UI_SHADOW_RULE_2">Shadow can propose create/update actions, but you confirm before execution.</span></div>
+              <div class="shadow-rule-item"><strong>3.</strong> <span data-locale="UI_SHADOW_RULE_3">Use valid identifier formats when restricting to a specific player.</span></div>
+              <div class="shadow-rule-item"><strong>4.</strong> <span data-locale="UI_SHADOW_RULE_4">Content moderation applies to all chat messages.</span></div>
+            </div>
+            <div class="shadow-fair-use-notice">
+              <i class="fas fa-balance-scale"></i>
+              <span data-locale="UI_SHADOW_FAIR_USE_NOTICE">Shadow is for admins only. Please use it thoughtfully so everyone gets a fair share. If overused, admins may enable stricter limits.</span>
+            </div>
+            <div class="shadow-rules-actions">
+              <button class="btn btn-primary" id="talkToShadowBtn" data-locale="UI_SHADOW_TALK_BUTTON">Talk to Shadow</button>
+            </div>
+          </div>
+
+          <div id="shadowChatPage" class="shadow-chat-page hidden">
+            <div class="shadow-chat-header">
+              <div class="shadow-chat-title-wrap">
+                <div class="shadow-chat-avatar"><i class="fas fa-robot"></i></div>
+                <div>
+                  <h3 data-locale="UI_SHADOW_CHAT_TITLE">Shadow Chat</h3>
+                  <p data-locale="UI_SHADOW_CHAT_SUBTITLE">Create, search, and edit codes through conversation.</p>
+                </div>
+              </div>
+            </div>
+            <div class="ai-chat-container shadow-chat-container">
+              <div class="ai-chat-messages" id="shadowChatMessages">
+                <div class="ai-message ai-assistant-message">
+                  <div class="ai-message-avatar"><i class="fas fa-robot"></i></div>
+                  <div class="ai-message-content">
+                    <div class="ai-message-name">shadow</div>
+                    <div class="ai-message-text" data-locale="UI_SHADOW_INITIAL_GREETING">Hello, what kind of code generation do you need today?</div>
+                  </div>
+                </div>
+                <div class="ai-typing-indicator hidden" id="shadowTypingIndicator">
+                  <div class="ai-message ai-assistant-message">
+                    <div class="ai-message-avatar"><i class="fas fa-robot"></i></div>
+                    <div class="ai-message-content">
+                      <div class="ai-message-name">shadow</div>
+                      <div class="ai-thinking-status" id="shadowThinkingStatus"></div>
+                      <div class="ai-typing-dots"><span></span><span></span><span></span></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="ai-chat-input-container">
+                <div class="ai-chat-input-wrapper">
+                  <textarea id="shadowChatInput" class="input ai-chat-input" rows="2" data-locale-placeholder="UI_SHADOW_CHAT_PLACEHOLDER" placeholder="Describe what you need..."></textarea>
+                  <button class="btn btn-primary ai-send-btn" id="shadowSendMessage" data-locale="UI_SHADOW_SEND">Send</button>
+                </div>
+              </div>
+            </div>
+            <div id="shadowActionCardHost"></div>
+          </div>
+        </div>
+      </section>
+
+
+      <section id="route-admin-codes" class="route">
+        <div class="panel">
+          <div class="panel-title" data-locale="ADMIN_MANAGE_TITLE">Code Management</div>
+          
+
+          
+
+          <div class="search-section">
+            <div class="search-header">
+              <h3 data-locale="UI_SEARCH_FILTER_TITLE">Search & Filter Codes</h3>
+              <p data-locale="UI_SEARCH_FILTER_DESCRIPTION">Find codes quickly with advanced search and filtering options</p>
+            </div>
+            
+            <div class="search-controls">
+              <div class="search-row">
+                <div class="search-input-group">
+                  <label for="codeSearch" data-locale="UI_SEARCH_BY_CODE">Search by Code</label>
+                  <div class="search-input-wrapper">
+                    <span class="search-icon"><i class="fas fa-search"></i></span>
+                    <input type="text" id="codeSearch" class="search-input" placeholder="Enter code name or partial match..." data-locale-placeholder="UI_SEARCH_BY_CODE_PLACEHOLDER">
+                    <button class="clear-search" id="clearCodeSearch"><i class="fas fa-times"></i></button>
+                  </div>
+                </div>
+                
+                <div class="search-input-group">
+                  <label for="creatorSearch" data-locale="UI_SEARCH_BY_CREATOR">Search by Creator</label>
+                  <div class="search-input-wrapper">
+                    <span class="search-icon"><i class="fas fa-user"></i></span>
+                    <input type="text" id="creatorSearch" class="search-input" placeholder="Creator name..." data-locale-placeholder="UI_SEARCH_BY_CREATOR_PLACEHOLDER">
+                    <button class="clear-search" id="clearCreatorSearch"><i class="fas fa-times"></i></button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="filter-row">
+                <div class="filter-group">
+                  <label for="dateFrom" data-locale="UI_DATE_FROM">Date From</label>
+                  <input type="date" id="dateFrom" class="filter-input">
+                </div>
+                
+                <div class="filter-group">
+                  <label for="dateTo" data-locale="UI_DATE_TO">Date To</label>
+                  <input type="date" id="dateTo" class="filter-input">
+                </div>
+                
+                <div class="filter-group">
+                  <label for="statusFilter" data-locale="UI_STATUS_FILTER">Status</label>
+                  <select id="statusFilter" class="filter-input">
+                    <option value="" data-locale="UI_STATUS_ALL">All Status</option>
+                    <option value="active" data-locale="UI_STATUS_ACTIVE_FILTER">Active</option>
+                    <option value="expired" data-locale="UI_STATUS_EXPIRED_FILTER">Expired</option>
+                    <option value="used" data-locale="UI_STATUS_USED_FILTER">Fully Used</option>
+                  </select>
+                </div>
+                
+                <div class="filter-group">
+                  <label for="rewardTypeFilter" data-locale="UI_REWARD_TYPE_FILTER">Reward Type</label>
+                  <select id="rewardTypeFilter" class="filter-input">
+                    <option value="" data-locale="UI_REWARD_TYPE_ALL">All Types</option>
+                    <option value="item" data-locale="UI_REWARD_TYPE_ITEMS">Items</option>
+                    <option value="money" data-locale="UI_REWARD_TYPE_MONEY">Money</option>
+                    <option value="vehicle" data-locale="UI_REWARD_TYPE_VEHICLES">Vehicles</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="search-actions">
+                <button class="btn btn-secondary" id="clearFilters" data-locale="UI_CLEAR_FILTERS">Clear Filters</button>
+                <button class="btn" id="applyFilters" data-locale="UI_APPLY_FILTERS">Apply Filters</button>
+              <button class="btn btn-primary" id="bulkGenerateBtn"><i class="fas fa-bullseye"></i> <span data-locale="UI_BULK_GENERATE">Bulk Generate</span></button>
+              </div>
+            </div>
+          </div>
+          
+
+          <div class="results-section">
+            <div class="results-header">
+              <div class="results-info">
+                <h3 data-locale="UI_CODE_RESULTS">Code Results</h3>
+                <span id="resultsCount" class="results-count">0 codes found</span>
+              </div>
+              <div class="results-controls">
+                <button class="btn btn-secondary btn-sm" id="refreshCodes"><i class="fas fa-sync-alt"></i> <span data-locale="UI_REFRESH_CODES">Refresh</span></button>
+                <select id="sortOrder" class="sort-select">
+                  <option value="newest" data-locale="UI_SORT_NEWEST">Newest First</option>
+                  <option value="oldest" data-locale="UI_SORT_OLDEST">Oldest First</option>
+                  <option value="alphabetical" data-locale="UI_SORT_ALPHABETICAL">A-Z</option>
+                  <option value="uses" data-locale="UI_SORT_USES">Most Uses</option>
+                  <option value="expiry" data-locale="UI_SORT_EXPIRY">Expiring Soon</option>
+                </select>
+              </div>
+            </div>
+            
+
+            <div class="code-list-container">
+              <div id="codeList" class="code-list">
+
+              </div>
+              
+
+              <div id="codeListLoading" class="loading-state">
+                <div class="loading-spinner"></div>
+                <p>Loading codes...</p>
+              </div>
+              
+
+              <div id="codeListEmpty" class="empty-state hidden">
+                <div class="empty-icon"><i class="fas fa-search"></i></div>
+                <h3>No codes found</h3>
+                <p>Try adjusting your search criteria or create some new codes</p>
+                <button class="btn btn-primary" id="createFirstCode">Create First Code</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      
+      <section id="route-code-view" class="route">
+        <div class="panel">
+          <div class="code-view-header">
+            <button class="back-btn" id="backToCodes">
+              <span class="back-icon"><i class="fas fa-arrow-left"></i></span>
+              Back to Codes
+            </button>
+            <div class="code-view-title">
+              <h2 id="viewCodeName">Code Details</h2>
+              <span class="code-status" id="viewCodeStatus">Active</span>
+            </div>
+          </div>
+          
+          <div class="cv-wrap">
+              <div class="code-details-card">
+                <div class="cd-head">
+                  <div class="cd-overview">
+                    <div class="cd-item">
+                      <div class="cd-label">Code</div>
+                      <div class="cd-value" id="viewCode">-</div>
+                    </div>
+                    <div class="cd-item">
+                      <div class="cd-label">Uses Left</div>
+                      <div class="cd-value" id="viewUses">-</div>
+                    </div>
+                    <div class="cd-item">
+                      <div class="cd-label">Per-User Limit</div>
+                      <div class="cd-value" id="viewPerUser">-</div>
+                    </div>
+                    <div class="cd-item">
+                      <div class="cd-label" data-locale="UI_CREATED_BY">Created By</div>
+                      <div class="cd-value" id="viewCreator">-</div>
+                    </div>
+                    <div class="cd-item">
+                      <div class="cd-label" data-locale="UI_CREATED_DATE">Created Date</div>
+                      <div class="cd-value" id="viewCreated">-</div>
+                    </div>
+                    <div class="cd-item">
+                      <div class="cd-label" data-locale="UI_EXPIRY_DATE">Expiry Date</div>
+                      <div class="cd-value" id="viewExpiry">-</div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="cd-section">
+                  <h3 class="cd-h">Rewards</h3>
+                  <div id="viewRewards" class="rewards-grid"></div>
+                </div>
+
+                <div class="cd-section" id="viewTimeRestrictions">
+                  <h3 class="cd-h"><i class="fas fa-clock"></i> Time Restrictions</h3>
+                  <div id="timeRestrictionsDisplay" class="cd-body">
+                    <span class="time-status">No time restrictions</span>
+                  </div>
+                </div>
+
+                <div class="cd-section">
+                  <h3 class="cd-h">Redemption History</h3>
+                  <div id="viewRedemptions" class="redemption-list"></div>
+                </div>
+
+                <div class="code-details-actions">
+                  <button class="btn" id="editCodeBtn"><i class="fas fa-edit"></i> Edit Code</button>
+                  <button class="btn btn-danger" id="deleteCodeBtn"><i class="fas fa-trash"></i> Delete Code</button>
+                </div>
+              </div>
+          </div>
+        </div>
+      </section>
+
+      
+      <section id="route-code-edit" class="route">
+        <div class="panel">
+          <div class="code-edit-header">
+            <button class="back-btn" id="backToView">
+              <span class="back-icon"><i class="fas fa-arrow-left"></i></span>
+              Back to View
+            </button>
+            <div class="code-edit-title">
+              <h2>Edit Code</h2>
+              <span class="edit-code-name" id="editCodeName">-</span>
+            </div>
+          </div>
+          
+          <div class="code-edit-content">
+            
+            <div class="edit-section">
+              <h3>Basic Settings</h3>
+              <div class="edit-form-grid">
+                <div class="form-group">
+                  <label for="editCode">Code Name</label>
+                  <input type="text" id="editCode" class="edit-input" placeholder="Enter new code name">
+                </div>
+                <div class="form-group">
+                  <label for="editUses">Uses Left</label>
+                  <input type="number" id="editUses" class="edit-input" min="0" placeholder="0">
+                </div>
+                <div class="form-group">
+                  <label for="editPerUser">Per-User Limit</label>
+                  <input type="number" id="editPerUser" class="edit-input" min="0" placeholder="1">
+                </div>
+                <div class="form-group">
+                  <label for="editExpiry" data-locale="UI_EXPIRY_DATETIME">Expiry Date & Time</label>
+                  <input type="datetime-local" id="editExpiry" class="edit-input">
+                </div>
+              </div>
+              <div class="edit-form-grid">
+                <div class="form-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="editRestrictToPlayerEnabled" class="checkbox-input">
+                    <span data-locale="UI_WIZARD_RESTRICT_TO_PLAYER">Restrict to specific player</span>
+                  </label>
+                </div>
+                <div class="form-group">
+                  <label for="editPlayerIdentifierType" data-locale="UI_WIZARD_IDENTIFIER_TYPE">Identifier Type</label>
+                  <select id="editPlayerIdentifierType" class="edit-input">
+                    <option value="citizenid">Citizen ID</option>
+                    <option value="characterid">Character ID</option>
+                    <option value="license">License</option>
+                    <option value="license2">License2</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="editPlayerIdentifierValue" data-locale="UI_WIZARD_IDENTIFIER_VALUE">Identifier Value</label>
+                  <input type="text" id="editPlayerIdentifierValue" class="edit-input" placeholder="e.g. license2:xxxxxxxx">
+                </div>
+              </div>
+            </div>
+            
+            
+            <div class="edit-section">
+              <h3>Rewards</h3>
+              <div class="rewards-editor">
+                <div class="reward-builder">
+                  <div class="reward-inputs">
+                    <select id="editRewardType" class="reward-type-select">
+                      <option value="item">Item</option>
+                      <option value="money">Money</option>
+                      <option value="vehicle">Vehicle</option>
+                    </select>
+                    <input type="text" id="editRewardName" class="reward-name-input" placeholder="Item spawn name or vehicle model">
+                    <input type="text" id="editRewardLabel" class="reward-label-input" placeholder="Display label (e.g. Water Bottle)">
+                    <input type="number" id="editRewardAmount" class="reward-amount-input" min="1" value="1">
+                    <button class="btn btn-secondary" id="addEditReward">Add Reward</button>
+                  </div>
+                </div>
+                
+                <div class="edit-rewards-table">
+                  <table id="editRewardsTable">
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th>Name/Model</th>
+                        <th>Amount</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody id="editRewardsTbody">
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            
+            
+            <div class="edit-actions">
+              <button class="btn btn-secondary" id="resetEdit">Reset Changes</button>
+              <button class="btn" id="saveEdit">Save Changes</button>
+              <button class="btn btn-danger" id="deleteEdit">Delete Code</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="route-admin-settings" class="route">
+        <div class="panel">
+                      <div class="panel-title" data-locale="UI_NAVIGATION_SETTINGS">Settings</div>
+          
+          <div class="settings-section">
+            <div class="sub-title">Settings</div>
+            
+            
+            <div class="settings-nav">
+              <button class="btn btn-primary" id="displaySettingsBtn" data-section="displaySettingsSection" data-locale="UI_SETTINGS_DISPLAY_SETTINGS">Display Settings</button>
+              <button class="btn btn-secondary" id="permissionsBtn" data-section="permissionsSection" data-locale="UI_SETTINGS_PERMISSIONS">Permissions</button>
+              <button class="btn btn-secondary" id="codeSettingsBtn" data-section="codeSettingsSection" data-locale="UI_SETTINGS_CODE_SETTINGS">Code Settings</button>
+              <button class="btn btn-secondary" id="aiChatSettingsBtn" data-section="aiChatSettingsSection" data-locale="UI_SETTINGS_SHADOW_CHAT_SETTINGS">Shadow Chat Settings</button>
+              <button class="btn btn-secondary owner-only-setting hidden" id="runtimeConfigBtn" data-section="runtimeConfigSection" data-locale="UI_SETTINGS_RUNTIME_CONFIG">Config</button>
+            </div>
+            
+            
+            <div id="displaySettingsSection" class="settings-content hidden">
+              <div class="sub-title" data-locale="UI_SETTINGS_LANGUAGE_SETTINGS">Language Settings</div>
+              <div class="form-row">
+                <label data-locale="UI_SETTINGS_LANGUAGE">Language</label>
+                <select id="languageSelector" class="input">
+                </select>
+              </div>
+              
+              <div class="sub-title" data-locale="UI_SETTINGS_COLOR_THEMES">Color Themes</div>
+              <div class="quick-colors">
+                <button class="color-theme-btn" data-theme="default" data-locale="UI_COLOR_THEME_DEFAULT">Default</button>
+                <button class="color-theme-btn" data-theme="blue" data-locale="UI_COLOR_THEME_BLUE">Blue</button>
+                <button class="color-theme-btn" data-theme="green" data-locale="UI_COLOR_THEME_GREEN">Green</button>
+                <button class="color-theme-btn" data-theme="purple" data-locale="UI_COLOR_THEME_PURPLE">Purple</button>
+                <button class="color-theme-btn" data-theme="red" data-locale="UI_COLOR_THEME_RED">Red</button>
+                <button class="color-theme-btn" data-theme="orange" data-locale="UI_COLOR_THEME_ORANGE">Orange</button>
+              </div>
+              
+              <div class="sub-title"><i class="fas fa-palette"></i> <span data-locale="UI_SETTINGS_CUSTOM_COLORS">Complete Color Customization</span></div>
+              <div class="color-customization-tabs">
+                <button class="color-tab-btn active" data-tab="brand" data-locale="UI_SETTINGS_BRAND_COLORS">Brand Colors</button>
+                <button class="color-tab-btn" data-tab="status" data-locale="UI_SETTINGS_STATUS_COLORS">Status Colors</button>
+                <button class="color-tab-btn" data-tab="background" data-locale="UI_SETTINGS_BACKGROUNDS">Backgrounds</button>
+                <button class="color-tab-btn" data-tab="text" data-locale="UI_SETTINGS_TEXT_COLORS">Text Colors</button>
+                <button class="color-tab-btn" data-tab="borders" data-locale="UI_SETTINGS_BORDERS_EFFECTS">Borders & Effects</button>
+              </div>
+              
+              
+              <div class="color-tab-content active" id="brand-colors">
+              <div class="color-inputs">
+                <div class="form-row">
+                  <label data-locale="UI_SETTINGS_PRIMARY_COLOR_DESC">Primary Color (Buttons, navigation active items, titles, brand logo, input focus)</label>
+                    <input type="color" id="primary-custom" class="color-picker" value="#4299e1">
+                  </div>
+                <div class="form-row">
+                  <label data-locale="UI_SETTINGS_PRIMARY_DARK_DESC">Primary Dark (Button gradient end, active states depth)</label>
+                    <input type="color" id="primary-dark-custom" class="color-picker" value="#3182ce">
+                </div>
+                </div>
+              </div>
+              
+              
+              <div class="color-tab-content" id="status-colors">
+                <div class="color-inputs">
+                <div class="form-row">
+                  <label data-locale="UI_SETTINGS_SUCCESS_COLOR_DESC">Success Color (Success badges, active status indicators, success buttons, KPI numbers)</label>
+                    <input type="color" id="success-custom" class="color-picker" value="#48bb78">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_SUCCESS_DARK_DESC">Success Dark (Success button gradient end, hover states)</label>
+                    <input type="color" id="success-dark-custom" class="color-picker" value="#38a169">
+                </div>
+                <div class="form-row">
+                  <label data-locale="UI_SETTINGS_DANGER_COLOR_DESC">Danger Color (Delete buttons, expired badges, danger status indicators, KPI numbers)</label>
+                    <input type="color" id="danger-custom" class="color-picker" value="#f56565">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_DANGER_DARK_DESC">Danger Dark (Danger button gradient end, hover states)</label>
+                    <input type="color" id="danger-dark-custom" class="color-picker" value="#e53e3e">
+                </div>
+                <div class="form-row">
+                  <label data-locale="UI_SETTINGS_WARNING_COLOR_DESC">Warning Color (Warning badges, used/full status indicators, warning buttons, KPI numbers)</label>
+                    <input type="color" id="warning-custom" class="color-picker" value="#ed8936">
+                </div>
+                <div class="form-row">
+                    <label data-locale="UI_SETTINGS_WARNING_DARK_DESC">Warning Dark (Warning button gradient end, hover states)</label>
+                    <input type="color" id="warning-dark-custom" class="color-picker" value="#dd6b20">
+                  </div>
+                </div>
+              </div>
+              
+              
+              <div class="color-tab-content" id="background-colors">
+                <div class="color-inputs">
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_MAIN_BACKGROUND_DESC">Main Background (Overall page background gradient base color)</label>
+                    <input type="color" id="bg-custom" class="color-picker" value="#0a0e1a">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_BG_PRIMARY_DESC">Primary Background (Main page background, input fields, toggle buttons)</label>
+                    <input type="color" id="bg-primary-custom" class="color-picker" value="#1a1f2e">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_BG_SECONDARY_DESC">Secondary Background (App container background, sidebar background)</label>
+                    <input type="color" id="bg-secondary-custom" class="color-picker" value="#1a1f2e">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_BG_TERTIARY_DESC">Tertiary Background (Disabled buttons)</label>
+                    <input type="color" id="bg-tertiary-custom" class="color-picker" value="#1a1f2e">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_PANEL_BACKGROUND_DESC">Panel Background (Cards, modals, tables, containers)</label>
+                    <input type="color" id="panel-custom" class="color-picker" value="#2d3748">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_GLASS_BACKGROUND_DESC">Glass Background (Glassmorphic elements - buttons, sidebar, navigation items)</label>
+                    <input type="color" id="glass-custom" class="color-picker" value="#ffffff">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_INPUT_BACKGROUND_DESC">Input Background (Text input fields, search boxes)</label>
+                    <input type="color" id="input-bg-custom" class="color-picker" value="#2d3748">
+                  </div>
+                </div>
+              </div>
+              
+              
+              <div class="color-tab-content" id="text-colors">
+                <div class="color-inputs">
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_PRIMARY_TEXT_DESC">Primary Text (Main body text, headings, primary content)</label>
+                    <input type="color" id="text-custom" class="color-picker" value="#f1f5f9">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_MUTED_TEXT_DESC">Muted Text (Labels, descriptions, secondary information)</label>
+                    <input type="color" id="text-muted-custom" class="color-picker" value="#94a3b8">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_DIM_TEXT_DESC">Dim Text (Less important text, placeholders, subtle information)</label>
+                    <input type="color" id="text-dim-custom" class="color-picker" value="#64748b">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_SECONDARY_TEXT_DESC">Secondary Text (Alternative text color for contrast areas)</label>
+                    <input type="color" id="text-secondary-custom" class="color-picker" value="#cbd5e1">
+                  </div>
+                </div>
+              </div>
+              
+              
+              <div class="color-tab-content" id="borders-colors">
+                <div class="color-inputs">
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_BORDER_COLOR_DESC">Border Color (General borders on cards, sections, dividers)</label>
+                    <input type="color" id="border-custom" class="color-picker" value="#94a3b8">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_GLASS_BORDER_DESC">Glass Border (Borders on glassmorphic elements - buttons, cards, inputs, sidebar)</label>
+                    <input type="color" id="glass-border-custom" class="color-picker" value="#ffffff">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_HOVER_BACKGROUND_DESC">Hover Background (Background color when hovering over buttons, nav items, interactive elements)</label>
+                    <input type="color" id="hover-bg-custom" class="color-picker" value="#4299e1">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_ACTIVE_BACKGROUND_DESC">Active Background (Background color for active/selected navigation items, tabs)</label>
+                    <input type="color" id="active-bg-custom" class="color-picker" value="#4299e1">
+                  </div>
+                </div>
+              </div>
+              
+              <div class="actions-right">
+                <button class="btn btn-secondary" onclick="resetCustomColors()" data-locale="UI_SETTINGS_RESET_ALL_COLORS">Reset All Colors</button>
+                <button class="btn btn-primary" onclick="saveCustomColors()" data-locale="UI_SETTINGS_SAVE_CUSTOM_COLORS">Save Custom Colors</button>
+              </div>
+
+              <div class="version-info-panel">
+                <div class="sub-title" data-locale="UI_VERSION_INFO">Version Information</div>
+                <div class="version-info-rows">
+                  <p><span data-locale="UI_VERSION_CURRENT">Installed Version:</span> <strong id="versionCurrent">—</strong></p>
+                  <p id="versionLatestRow" class="hidden"><span data-locale="UI_VERSION_LATEST">Latest Version:</span> <strong id="versionLatest">—</strong></p>
+                  <p id="versionStatusText" class="version-status-text" data-locale="UI_VERSION_CHECKING">Checking for updates...</p>
+                </div>
+                <div id="versionUpdateBlock" class="hidden">
+                  <div class="version-update-title" data-locale="UI_VERSION_UPDATE_AVAILABLE">Update Available</div>
+                  <div id="versionUpdateNotes" class="version-update-notes"></div>
+                  <a id="versionReleaseLink" class="version-release-link" href="https://github.com/midnightchronicles/midnight_redeem/releases" target="_blank" rel="noopener noreferrer" data-locale="UI_VERSION_VIEW_RELEASE">View Release on GitHub</a>
+                </div>
+                <button type="button" class="btn btn-secondary btn-sm version-refresh-btn" id="refreshVersionBtn">
+                  <i class="fas fa-sync-alt"></i> <span data-locale="UI_VERSION_REFRESH">Check Again</span>
+                </button>
+              </div>
+            </div>
+            
+            
+            <div id="codeSettingsSection" class="settings-content hidden" style="display: none;">
+              <div class="sub-title" data-locale="UI_SETTINGS_CODE_MANAGEMENT">Code Management</div>
+              
+              <div class="purge-section">
+                <div class="sub-title" data-locale="UI_SETTINGS_PURGE_CODES">Purge Codes</div>
+                <p class="purge-description" data-locale="UI_SETTINGS_PURGE_DESCRIPTION">Remove codes from the database based on creation date. This action cannot be undone.</p>
+                
+                <div class="purge-options">
+                  <div class="form-row">
+                    <label class="checkbox-label">
+                      <input type="checkbox" id="purgeIncludeActive" class="checkbox-input">
+                      <span data-locale="UI_SETTINGS_PURGE_INCLUDE_ACTIVE">Include active codes (codes with remaining uses and not expired)</span>
+                    </label>
+                  </div>
+                  
+                  <button class="btn btn-danger" id="purgeDayBtn">
+                    <i class="fas fa-trash"></i> <span class="btn-text" data-locale="UI_SETTINGS_PURGE_DAY">Purge Last 1 Day</span>
+                  </button>
+                  <button class="btn btn-danger" id="purgeWeekBtn">
+                    <i class="fas fa-trash"></i> <span class="btn-text" data-locale="UI_SETTINGS_PURGE_WEEK">Purge Last 1 Week</span>
+                  </button>
+                  <button class="btn btn-danger" id="purgeMonthBtn">
+                    <i class="fas fa-trash"></i> <span class="btn-text" data-locale="UI_SETTINGS_PURGE_MONTH">Purge Last 1 Month</span>
+                  </button>
+                  <button class="btn btn-danger" id="purgeAllBtn">
+                    <i class="fas fa-trash"></i> <span class="btn-text" data-locale="UI_SETTINGS_PURGE_ALL">Purge All Codes</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            
+            <div id="runtimeConfigSection" class="settings-content hidden">
+              <div class="sub-title" data-locale="UI_SETTINGS_RUNTIME_CONFIG_TITLE">Server Config</div>
+              <p class="input-help" data-locale="UI_SETTINGS_RUNTIME_CONFIG_DESC">Edit live server configuration. Changes are saved to the database and persist across restarts.</p>
+              <p class="input-help owner-only-notice hidden" data-locale="UI_SETTINGS_OWNER_ONLY">Owner access required to change these settings.</p>
+
+              <div class="runtime-config-nav">
+                <button type="button" class="btn btn-primary" data-config-tab="general" data-locale="UI_SETTINGS_CONFIG_GENERAL">General</button>
+                <button type="button" class="btn btn-secondary" data-config-tab="daily" data-locale="UI_SETTINGS_CONFIG_DAILY">Daily Rewards</button>
+                <button type="button" class="btn btn-secondary" data-config-tab="prefilled" data-locale="UI_SETTINGS_CONFIG_PREFILLED">Prefilled</button>
+                <button type="button" class="btn btn-secondary" data-config-tab="contentFilter" data-locale="UI_SETTINGS_CONFIG_CONTENT_FILTER">Content Filter</button>
+              </div>
+
+              <div id="runtimeConfigGeneral" class="runtime-config-tab">
+                <div class="runtime-config-panel">
+                  <div class="form-row"><label data-locale="UI_SETTINGS_CONFIG_DEBUG">Debug logging</label><label class="toggle-switch"><input type="checkbox" id="cfgDebug"><span class="toggle-slider"></span></label></div>
+                  <div class="form-row"><label for="cfgFramework" data-locale="UI_SETTINGS_CONFIG_FRAMEWORK">Framework</label><select id="cfgFramework" class="input"><option value="qb">qb</option><option value="esx">esx</option></select></div>
+                  <div class="form-row"><label for="cfgAdminCommand" data-locale="UI_SETTINGS_CONFIG_ADMIN_CMD">Admin command</label><input id="cfgAdminCommand" class="input" type="text"></div>
+                  <div class="form-row"><label for="cfgRedeemCommand" data-locale="UI_SETTINGS_CONFIG_REDEEM_CMD">Redeem command</label><input id="cfgRedeemCommand" class="input" type="text"></div>
+                  <div class="form-row"><label for="cfgMinCustomChar" data-locale="UI_SETTINGS_CONFIG_MIN_CHARS">Minimum custom code length</label><input id="cfgMinCustomChar" class="input" type="number" min="1" max="60"></div>
+                  <div class="form-row"><label for="cfgSqlCleanUpDays" data-locale="UI_SETTINGS_CONFIG_SQL_CLEANUP">SQL cleanup days</label><input id="cfgSqlCleanUpDays" class="input" type="number" min="0" max="365"></div>
+                  <div class="form-row"><label for="cfgDashboardRefresh" data-locale="UI_SETTINGS_CONFIG_DASHBOARD_REFRESH">Dashboard refresh interval (seconds)</label><input id="cfgDashboardRefresh" class="input" type="number" min="30" max="3600"></div>
+                  <div class="form-row"><label for="cfgLogsystem" data-locale="UI_SETTINGS_CONFIG_LOGSYSTEM">Log system</label><select id="cfgLogsystem" class="input"><option value="both">both</option><option value="discord">discord</option><option value="fivemanage">fivemanage</option></select></div>
+                </div>
+              </div>
+
+              <div id="runtimeConfigDaily" class="runtime-config-tab hidden">
+                <div class="runtime-config-panel">
+                  <div class="form-row"><label data-locale="UI_SETTINGS_CONFIG_DAILY_ENABLED">Daily rewards enabled</label><label class="toggle-switch"><input type="checkbox" id="cfgDailyEnabled"><span class="toggle-slider"></span></label></div>
+                  <div class="form-row"><label for="cfgRewardTimes" data-locale="UI_SETTINGS_CONFIG_REWARD_TIMES">Reward times (comma separated HH:MM)</label><input id="cfgRewardTimes" class="input" type="text" placeholder="00:00, 12:00"></div>
+                  <div class="form-row"><label for="cfgDailyUses" data-locale="UI_SETTINGS_CONFIG_DAILY_USES">Daily code uses</label><input id="cfgDailyUses" class="input" type="number" min="1"></div>
+                  <div class="form-row"><label for="cfgDailyPerUser" data-locale="UI_SETTINGS_CONFIG_DAILY_PER_USER">Per-user limit</label><input id="cfgDailyPerUser" class="input" type="number" min="1"></div>
+                  <div class="form-row"><label for="cfgDailyHours" data-locale="UI_SETTINGS_CONFIG_DAILY_HOURS">Reward window (hours)</label><input id="cfgDailyHours" class="input" type="number" min="1"></div>
+                  <div class="form-row">
+                    <label data-locale="UI_SETTINGS_CONFIG_DAILY_ROTATION">Daily reward rotation</label>
+                    <p class="input-help" data-locale="UI_SETTINGS_CONFIG_DAILY_ROTATION_DESC">Each rotation entry is one possible daily code reward pool. Add rewards per entry with item labels for display.</p>
+                    <div id="dailyRewardsEditor" class="config-list-editor-host"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div id="runtimeConfigPrefilled" class="runtime-config-tab hidden">
+                <div class="runtime-config-panel">
+                  <p class="input-help" data-locale="UI_SETTINGS_CONFIG_PREFILLED_DESC">Edit reward categories, quick templates, and AI code templates.</p>
+                  <div id="prefilledRewardsEditor" class="config-list-editor-host"></div>
+                </div>
+              </div>
+
+              <div id="runtimeConfigContentFilter" class="runtime-config-tab hidden">
+                <div class="runtime-config-panel">
+                  <p class="input-help" data-locale="UI_SETTINGS_CONFIG_FILTER_DESC">Add blocked words by category. Used to block inappropriate code names and chat messages.</p>
+                  <div id="contentFilterEditor" class="config-list-editor-host"></div>
+                </div>
+              </div>
+
+              <div class="runtime-config-actions">
+                <button type="button" class="btn btn-primary" id="saveRuntimeConfigBtn"><i class="fas fa-save"></i> <span data-locale="UI_SETTINGS_CONFIG_SAVE">Save Config</span></button>
+                <button type="button" class="btn btn-secondary" id="resetRuntimeConfigBtn"><i class="fas fa-undo"></i> <span data-locale="UI_SETTINGS_CONFIG_RESET">Reset Tab to Defaults</span></button>
+              </div>
+            </div>
+            
+            <div id="aiChatSettingsSection" class="settings-content hidden">
+              <div class="sub-title" data-locale="UI_SETTINGS_SHADOW_CHAT_SETTINGS_TITLE">Shadow Chat Settings</div>
+              
+              <div class="ai-chat-settings-nav">
+                <button class="btn btn-primary" id="transcriptsBtn" data-subsection="transcriptsSection" data-locale="UI_SETTINGS_TRANSCRIPTS">Transcripts</button>
+                <button class="btn btn-secondary owner-only-setting hidden" id="chatSettingsBtn" data-subsection="chatSettingsSection" data-locale="UI_SETTINGS_CHAT_SETTINGS">Chat Settings</button>
+              </div>
+              
+              <div id="transcriptsSection" class="ai-chat-subsection hidden">
+                <div class="sub-title" data-locale="UI_SETTINGS_TRANSCRIPTS_TITLE">Chat Transcripts</div>
+                <p class="input-help" data-locale="UI_SETTINGS_TRANSCRIPTS_DESCRIPTION">View and manage your AI chat conversation history. Click on a session to view the full conversation.</p>
+                
+                <div class="transcript-search-section">
+                  <div class="search-header">
+                    <h3 data-locale="UI_TRANSCRIPT_SEARCH_TITLE">Search & Filter Transcripts</h3>
+                    <p data-locale="UI_TRANSCRIPT_SEARCH_DESCRIPTION">Find transcripts quickly with advanced search and filtering options</p>
+                  </div>
+                  
+                  <div class="search-controls">
+                    <div class="search-row">
+                      <div class="search-input-group">
+                        <label for="transcriptSessionIdSearch" data-locale="UI_SEARCH_BY_SESSION_ID">Search by Session ID</label>
+                        <div class="search-input-wrapper">
+                          <span class="search-icon"><i class="fas fa-search"></i></span>
+                          <input type="text" id="transcriptSessionIdSearch" class="search-input" placeholder="Enter session ID..." data-locale-placeholder="UI_SEARCH_BY_SESSION_ID_PLACEHOLDER">
+                          <button class="clear-search" id="clearTranscriptSessionIdSearch"><i class="fas fa-times"></i></button>
+                        </div>
+                      </div>
+                      
+                      <div class="search-input-group">
+                        <label for="transcriptPlayerSearch" data-locale="UI_SEARCH_BY_PLAYER">Search by Player</label>
+                        <div class="search-input-wrapper">
+                          <span class="search-icon"><i class="fas fa-user"></i></span>
+                          <input type="text" id="transcriptPlayerSearch" class="search-input" placeholder="Enter player name..." data-locale-placeholder="UI_SEARCH_BY_PLAYER_PLACEHOLDER">
+                          <button class="clear-search" id="clearTranscriptPlayerSearch"><i class="fas fa-times"></i></button>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="filter-row">
+                      <div class="filter-group">
+                        <label for="transcriptDateFrom" data-locale="UI_DATE_FROM">Date From</label>
+                        <input type="date" id="transcriptDateFrom" class="filter-input">
+                      </div>
+                      
+                      <div class="filter-group">
+                        <label for="transcriptDateTo" data-locale="UI_DATE_TO">Date To</label>
+                        <input type="date" id="transcriptDateTo" class="filter-input">
+                      </div>
+                    </div>
+                    
+                    <div class="search-actions">
+                      <button class="btn btn-secondary" id="clearTranscriptFilters" data-locale="UI_CLEAR_FILTERS">Clear Filters</button>
+                      <button class="btn" id="applyTranscriptFilters" data-locale="UI_APPLY_FILTERS">Apply Filters</button>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="transcripts-results-section">
+                  <div class="results-header">
+                    <div class="results-info">
+                      <h3 data-locale="UI_TRANSCRIPT_RESULTS">Transcript Results</h3>
+                      <span id="transcriptResultsCount" class="results-count">0 transcripts found</span>
+                    </div>
+                    <div class="results-controls">
+                      <button class="btn btn-secondary btn-sm" id="refreshTranscripts"><i class="fas fa-sync-alt"></i> <span data-locale="UI_REFRESH_CODES">Refresh</span></button>
+                      <select id="transcriptSortOrder" class="sort-select">
+                        <option value="newest" data-locale="UI_SORT_NEWEST">Newest First</option>
+                        <option value="oldest" data-locale="UI_SORT_OLDEST">Oldest First</option>
+                        <option value="player" data-locale="UI_SORT_PLAYER">Player A-Z</option>
+                        <option value="messages" data-locale="UI_SORT_MESSAGES">Most Messages</option>
+                      </select>
+                    </div>
+                  </div>
+                  
+                  <div class="transcripts-list" id="transcriptsList">
+                    <div class="loading-state" id="transcriptsLoading">
+                      <i class="fas fa-spinner fa-spin"></i> Loading transcripts...
+                    </div>
+                    <div class="empty-state hidden" id="transcriptsEmpty">
+                      <i class="fas fa-comments"></i>
+                      <p data-locale="UI_SETTINGS_NO_TRANSCRIPTS">No chat transcripts found.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div id="chatSettingsSection" class="ai-chat-subsection hidden">
+                <div class="sub-title" data-locale="UI_SETTINGS_CHAT_SETTINGS_TITLE">Chat Settings</div>
+                <p class="input-help" data-locale="UI_SETTINGS_CHAT_SETTINGS_DESCRIPTION">Configure Shadow chat behaviour, limits, and transcript maintenance for your server.</p>
+
+                <p class="input-help owner-only-notice hidden" data-locale="UI_SETTINGS_OWNER_ONLY">Owner access required to change these settings.</p>
+
+                <div class="chat-settings-panel" id="chatSettingsPanel">
+                  <div class="form-row">
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="aiChatEnabledToggle">
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <div class="toggle-label">
+                      <strong data-locale="UI_SETTINGS_CHAT_ENABLED">Enable Shadow Chat</strong>
+                      <span class="input-help" data-locale="UI_SETTINGS_CHAT_ENABLED_DESC">Allow admins to use the Shadow AI assistant and chat transcripts.</span>
+                    </div>
+                  </div>
+
+                  <div class="form-row">
+                    <label for="aiChatRateLimit" data-locale="UI_SETTINGS_CHAT_RATE_LIMIT">Messages per user limit</label>
+                    <input type="number" id="aiChatRateLimit" class="input" min="0" max="10000" step="1">
+                    <p class="input-help" data-locale="UI_SETTINGS_CHAT_RATE_LIMIT_DESC">Maximum Shadow messages each user can send per window. Use 0 for unlimited.</p>
+                  </div>
+
+                  <div class="form-row">
+                    <label for="aiChatRateLimitWindow" data-locale="UI_SETTINGS_CHAT_RATE_WINDOW">Rate limit window (hours)</label>
+                    <input type="number" id="aiChatRateLimitWindow" class="input" min="1" max="168" step="1">
+                    <p class="input-help" data-locale="UI_SETTINGS_CHAT_RATE_WINDOW_DESC">How long the message limit applies before it resets.</p>
+                  </div>
+
+                  <div class="form-row">
+                    <label for="aiChatTranscriptRetention" data-locale="UI_SETTINGS_CHAT_RETENTION">Transcript retention (days)</label>
+                    <input type="number" id="aiChatTranscriptRetention" class="input" min="0" max="365" step="1">
+                    <p class="input-help" data-locale="UI_SETTINGS_CHAT_RETENTION_DESC">Auto-delete transcripts older than this many days. Use 0 to disable automatic cleanup.</p>
+                  </div>
+
+                  <div class="form-row">
+                    <label for="aiChatWelcomeMessage" data-locale="UI_SETTINGS_CHAT_WELCOME">Welcome message</label>
+                    <textarea id="aiChatWelcomeMessage" class="input chat-settings-textarea" rows="4" maxlength="500"></textarea>
+                    <p class="input-help" data-locale="UI_SETTINGS_CHAT_WELCOME_DESC">First message Shadow sends when a new chat session starts.</p>
+                  </div>
+
+                  <div class="chat-settings-readonly">
+                    <p><span data-locale="UI_SETTINGS_CHAT_WEB_SEARCH">Web search:</span> <strong id="aiChatWebSearchStatus">—</strong></p>
+                    <p><span data-locale="UI_SETTINGS_CHAT_PROVIDER">AI provider:</span> <strong id="aiChatProviderStatus">—</strong></p>
+                    <p><span data-locale="UI_SETTINGS_CHAT_MODEL">AI model:</span> <strong id="aiChatModelStatus">—</strong></p>
+                    <p class="input-help" data-locale="UI_SETTINGS_CHAT_SERVER_CFG_NOTE">Provider, model, and web search are controlled in server.cfg.</p>
+                  </div>
+
+                  <div class="chat-settings-actions">
+                    <button type="button" class="btn btn-primary" id="saveAIChatSettingsBtn">
+                      <i class="fas fa-save"></i> <span data-locale="UI_SETTINGS_CHAT_SAVE">Save Settings</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="runTranscriptCleanupBtn">
+                      <i class="fas fa-broom"></i> <span data-locale="UI_SETTINGS_CHAT_RUN_CLEANUP">Run Cleanup Now</span>
+                    </button>
+                    <button type="button" class="btn btn-secondary" id="resetAIChatRateLimitsBtn">
+                      <i class="fas fa-redo"></i> <span data-locale="UI_SETTINGS_CHAT_RESET_RATE_LIMITS">Reset Rate Limits</span>
+                    </button>
+                    <button type="button" class="btn btn-danger" id="clearAllTranscriptsBtn">
+                      <i class="fas fa-trash"></i> <span data-locale="UI_SETTINGS_CHAT_CLEAR_ALL">Clear All Transcripts</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            
+            <div id="permissionsSection" class="settings-content hidden">
+              <div class="sub-title" data-locale="UI_PERMISSIONS_TITLE">Permission Settings</div>
+              <div class="permission-info">
+                <p><span data-locale="UI_PERMISSIONS_CURRENT_ROLE">Current Role:</span> <span id="currentRole" class="role-badge">Loading...</span></p>
+                <p><span data-locale="UI_PERMISSIONS_PERMISSION_LEVEL">Permission Level:</span> <span id="permissionLevel" class="level-badge">Loading...</span></p>
+              </div>
+              
+              <div class="permission-actions" id="permissionActions" style="display: none;">
+                <div class="sub-title" data-locale="UI_PERMISSIONS_MANAGE_USERS">Manage Users</div>
+                <div class="permission-form">
+                  <div class="form-row">
+                    <label data-locale="UI_PERMISSIONS_PLAYER_ID">Player ID</label>
+                    <input type="number" id="permissionPlayerId" class="input" data-locale-placeholder="UI_PERMISSIONS_PLAYER_ID_PLACEHOLDER" placeholder="Enter player ID">
+                  </div>
+                  <div class="form-row">
+                    <label data-locale="UI_PERMISSIONS_NEW_ROLE">New Role</label>
+                    <select id="permissionRole" class="input">
+                      <option value="staff" data-locale="UI_PERMISSIONS_ROLE_STAFF">Staff</option>
+                      <option value="manager" data-locale="UI_PERMISSIONS_ROLE_MANAGER">Manager</option>
+                      <option value="owner" data-locale="UI_PERMISSIONS_ROLE_OWNER">Owner</option>
+                    </select>
+                  </div>
+                  <button class="btn" id="updatePermissionBtn" data-locale="UI_PERMISSIONS_UPDATE_ROLE">Update Role</button>
+                </div>
+                
+                <div class="sub-title" data-locale="UI_PERMISSIONS_ONLINE_PLAYERS">Online Players</div>
+                <div id="onlinePlayers" class="user-list">
+                  <p data-locale="UI_PERMISSIONS_LOADING_ONLINE_PLAYERS">Loading online players...</p>
+                </div>
+                
+                <div class="sub-title" data-locale="UI_PERMISSIONS_ALL_USERS">All Users</div>
+                <div id="userList" class="user-list">
+                  <p data-locale="UI_LOADING">Loading...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="route-player" class="route">
+        <div class="redeem-container">
+          <div class="redeem-card">
+            <div class="redeem-header">
+              <div class="redeem-icon"><i class="fas fa-gift"></i></div>
+              <h2 class="redeem-title">Redeem Code</h2>
+              <p class="redeem-subtitle">Enter your code to claim your rewards</p>
+          </div>
+          
+            <div class="redeem-form">
+              <div class="input-group">
+                <label for="redeemInput" class="input-label">Redemption Code</label>
+                <div class="input-wrapper">
+                  <input 
+                    id="redeemInput" 
+                    type="text" 
+                    class="redeem-input" 
+                    placeholder="Enter your code here..."
+                    autocomplete="off"
+                    spellcheck="false"
+                  >
+                  <div class="input-icon"><i class="fas fa-gift"></i></div>
+          </div>
+        </div>
+        
+              <div id="moneyOptions" class="money-options hidden">
+                <label class="input-label">Money Destination</label>
+                <div class="money-toggle">
+                  <button class="money-btn active" data-account="cash">
+                    <div class="money-icon"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="money-label">Cash</div>
+                  </button>
+                  <button class="money-btn" data-account="bank">
+                    <div class="money-icon"><i class="fas fa-university"></i></div>
+                    <div class="money-label">Bank</div>
+                  </button>
+            </div>
+          </div>
+          
+              <button id="redeemBtn" class="redeem-button" disabled>
+                <span class="btn-text">Redeem Code</span>
+                <span class="btn-icon">→</span>
+              </button>
+          </div>
+
+            <div id="redeemSuccessView" class="redeem-success-view hidden">
+              <div class="redeem-success-icon"><i class="fas fa-check-circle"></i></div>
+              <h2 class="redeem-success-title">CONGRATULATIONS YOU HAVE REDEEMED:</h2>
+              <div id="redeemSuccessRewards" class="redeem-success-rewards"></div>
+            </div>
+
+        </div>
+        </div>
+
+      </section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="title" data-locale="UI_CREATE_CODE_TITLE">Create Redeem Code</div>
+        <button class="icon-btn" id="modalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid">
+          <div class="form-row">
+            <label>Uses</label>
+            <input id="mUses" class="input" type="number" min="1" value="1">
+          </div>
+          <div class="form-row">
+            <label>Per-User Limit</label>
+            <input id="mPerUser" class="input" type="number" min="1" value="1">
+          </div>
+          <div class="form-row">
+            <label data-locale="UI_EXPIRY_DATETIME">Expiry Date & Time</label>
+            <input id="mExpiry" type="datetime-local" class="input">
+          </div>
+                      <div class="form-row">
+              <label data-locale="UI_CUSTOM_CODE_LABEL">Custom Code</label> <span class="required">*</span>
+              <input id="mCustomCode" class="input" placeholder="" minlength="1" required data-locale-placeholder="UI_WIZARD_CUSTOM_CODE_PLACEHOLDER">
+            </div>
+        </div>
+        
+        
+        <div class="rewards-section">
+          <h3>Rewards</h3>
+          <div class="rewards-form">
+            <div class="form-row">
+              <label>Reward Type</label>
+              <select id="mRewardType" class="input">
+                <option value="item">Item</option>
+                <option value="money">Money</option>
+                <option value="vehicle">Vehicle</option>
+              </select>
+            </div>
+            <div class="form-row" id="mItemRow">
+              <label>Item Name</label>
+              <input id="mItemName" class="input" placeholder="bread, water, etc.">
+            </div>
+            <div class="form-row" id="mVehicleRow" style="display: none;">
+              <label>Vehicle Model</label>
+              <input id="mVehicleModel" class="input" placeholder="adder, zentorno, etc.">
+            </div>
+            <div class="form-row">
+              <label>Amount</label>
+              <input id="mAmount" class="input" type="number" min="1" value="1">
+            </div>
+
+            <button class="btn btn-secondary" id="mAddReward">Add Reward</button>
+          </div>
+          
+          
+          <div class="rewards-table">
+            <h4>Current Rewards</h4>
+            <table id="mRewardsTable">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Name/Model</th>
+                  <th>Amount</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="mRewardsTbody">
+                
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="modalCancel">Cancel</button>
+        <button class="btn" id="modalCreate">Create Code</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <div id="deleteUserModal" class="modal hidden">
+    <div class="modal-card delete-modal">
+      <div class="modal-head">
+        <div class="title">Delete User</div>
+        <button class="icon-btn" id="deleteUserModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-content">
+          <div class="delete-icon"><i class="fas fa-user-times"></i></div>
+          <h3>Are you sure you want to delete this user?</h3>
+          <p>This action cannot be undone. The user <strong id="deleteUserText">Unknown</strong> will be permanently removed.</p>
+          
+          <div class="delete-details">
+            <div class="delete-row">
+              <strong>User:</strong> <span id="deleteUserName">Unknown</span>
+            </div>
+            <div class="delete-row">
+              <strong>Identifier:</strong> <span id="deleteUserIdentifier">Unknown</span>
+            </div>
+            <div class="delete-row">
+              <strong>Role:</strong> <span id="deleteUserRole">Unknown</span>
+            </div>
+          </div>
+          
+          <div class="delete-warning">
+            <p><strong><i class="fas fa-exclamation-triangle"></i> Warning:</strong> This will permanently delete the user and all associated permissions.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="deleteUserCancel">Cancel</button>
+        <button class="btn btn-danger" id="deleteUserConfirm">Delete User</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <div id="deleteCodeModal" class="modal hidden">
+    <div class="modal-card delete-modal">
+      <div class="modal-head">
+        <div class="title">Delete Code</div>
+        <button class="icon-btn" id="deleteCodeModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-content">
+          <div class="delete-icon"><i class="fas fa-trash"></i></div>
+          <h3>Are you sure you want to delete this code?</h3>
+          <p>This action cannot be undone. The code <strong id="deleteCodeText">Unknown</strong> will be permanently removed.</p>
+          
+          <div class="delete-details">
+            <div class="delete-row">
+              <strong>Code:</strong> <span id="deleteCodeValue">Unknown</span>
+            </div>
+            <div class="delete-row">
+              <strong>Uses Left:</strong> <span id="deleteCodeUses">Unknown</span>
+            </div>
+            <div class="delete-row">
+              <strong>Created By:</strong> <span id="deleteCodeCreatedBy">Unknown</span>
+            </div>
+          </div>
+          
+          <div class="delete-warning">
+            <p><strong><i class="fas fa-exclamation-triangle"></i> Warning:</strong> This will permanently delete the code and all associated data.</p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="deleteCodeCancel">Cancel</button>
+        <button class="btn btn-danger" id="deleteCodeConfirm">Delete Code</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="deleteTranscriptModal" class="modal hidden">
+    <div class="modal-card delete-modal">
+      <div class="modal-head">
+        <div class="title" data-locale="UI_DELETE_TRANSCRIPT_TITLE">Delete Transcript</div>
+        <button class="icon-btn" id="deleteTranscriptModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-content">
+          <div class="delete-icon"><i class="fas fa-trash"></i></div>
+          <h3 data-locale="UI_DELETE_TRANSCRIPT_CONFIRM">Are you sure you want to delete this transcript?</h3>
+          <p><span data-locale="UI_DELETE_TRANSCRIPT_DESCRIPTION">This action cannot be undone. The transcript session</span> <strong id="deleteTranscriptSessionId">Unknown</strong> <span data-locale="UI_DELETE_TRANSCRIPT_DESCRIPTION_END">will be permanently removed.</span></p>
+          
+          <div class="delete-details">
+            <div class="delete-row">
+              <strong data-locale="UI_DELETE_TRANSCRIPT_SESSION_ID">Session ID:</strong> <span id="deleteTranscriptSessionIdValue">Unknown</span>
+            </div>
+            <div class="delete-row">
+              <strong data-locale="UI_DELETE_TRANSCRIPT_PLAYER">Player:</strong> <span id="deleteTranscriptPlayerName">Unknown</span>
+            </div>
+            <div class="delete-row">
+              <strong data-locale="UI_DELETE_TRANSCRIPT_MESSAGES">Messages:</strong> <span id="deleteTranscriptMessageCount">Unknown</span>
+            </div>
+            <div class="delete-row">
+              <strong data-locale="UI_DELETE_TRANSCRIPT_CREATED">Created:</strong> <span id="deleteTranscriptCreatedAt">Unknown</span>
+            </div>
+          </div>
+          
+          <div class="delete-warning">
+            <p><strong><i class="fas fa-exclamation-triangle"></i> <span data-locale="UI_PURGE_WARNING_TITLE">Warning:</span></strong> <span data-locale="UI_DELETE_TRANSCRIPT_WARNING">This will permanently delete the transcript session and all associated messages.</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="deleteTranscriptCancel" data-locale="UI_BUTTON_CANCEL">Cancel</button>
+        <button class="btn btn-danger" id="deleteTranscriptConfirm" data-locale="UI_DELETE_TRANSCRIPT_BUTTON">Delete Transcript</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="clearAllTranscriptsModal" class="modal hidden">
+    <div class="modal-card delete-modal">
+      <div class="modal-head">
+        <div class="title" data-locale="UI_SETTINGS_CHAT_CLEAR_ALL_TITLE">Clear All Transcripts</div>
+        <button class="icon-btn" id="clearAllTranscriptsModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-content">
+          <div class="delete-icon"><i class="fas fa-trash"></i></div>
+          <h3 data-locale="UI_SETTINGS_CHAT_CLEAR_ALL_CONFIRM">Delete every Shadow chat transcript?</h3>
+          <p data-locale="UI_SETTINGS_CHAT_CLEAR_ALL_DESC">This permanently removes all stored Shadow chat sessions and messages. This action cannot be undone.</p>
+          <div class="delete-warning">
+            <p><strong><i class="fas fa-exclamation-triangle"></i> <span data-locale="UI_PURGE_WARNING_TITLE">Warning:</span></strong> <span data-locale="UI_SETTINGS_CHAT_CLEAR_ALL_WARNING">All transcript history will be lost immediately.</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="clearAllTranscriptsCancel" data-locale="UI_BUTTON_CANCEL">Cancel</button>
+        <button class="btn btn-danger" id="clearAllTranscriptsConfirm" data-locale="UI_SETTINGS_CHAT_CLEAR_ALL_BUTTON">Clear All Transcripts</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="purgeCodesModal" class="modal hidden">
+    <div class="modal-card delete-modal">
+      <div class="modal-head">
+        <div class="title" data-locale="UI_SETTINGS_PURGE_CODES">Purge Codes</div>
+        <button class="icon-btn" id="purgeCodesModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="delete-content">
+          <div class="delete-icon"><i class="fas fa-trash-alt"></i></div>
+          <h3 data-locale="UI_PURGE_CONFIRM_TITLE">Are you sure you want to purge these codes?</h3>
+          <p data-locale="UI_PURGE_CONFIRM_DESCRIPTION">This action cannot be undone. All codes created within the selected timeframe will be permanently removed.</p>
+          
+          <div class="delete-details">
+            <div class="delete-row">
+              <strong data-locale="UI_PURGE_PERIOD">Time Period:</strong> <span id="purgePeriodText">Unknown</span>
+            </div>
+            <div class="delete-row">
+              <strong data-locale="UI_PURGE_INCLUDE_ACTIVE_LABEL">Include Active Codes:</strong> <span id="purgeIncludeActiveText">No</span>
+            </div>
+          </div>
+          
+          <div class="delete-warning">
+            <p><strong><i class="fas fa-exclamation-triangle"></i> <span data-locale="UI_PURGE_WARNING_TITLE">Warning:</span></strong> <span data-locale="UI_PURGE_WARNING_MESSAGE">This will permanently delete all matching codes and all associated data.</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="purgeCodesCancel" data-locale="UI_BUTTON_CANCEL">Cancel</button>
+        <button class="btn btn-danger" id="purgeCodesConfirm" data-locale="UI_PURGE_CONFIRM_BUTTON">Purge Codes</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <div id="editRoleModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="title"><i class="fas fa-user-edit"></i> Edit User Role</div>
+        <button class="modal-close" id="editRoleModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="edit-role-info">
+          <p><strong data-locale="UI_DELETE_MODAL_USER_INFO">User:</strong> <span id="editRoleUserName">Unknown</span></p>
+          <p><strong data-locale="UI_PERMISSIONS_CURRENT_ROLE">Current Role:</strong> <span id="editRoleCurrentRole">Unknown</span></p>
+        </div>
+        
+        <div class="form-group">
+          <label for="editRoleSelect" data-locale="UI_PERMISSIONS_NEW_ROLE">New Role:</label>
+          <select id="editRoleSelect" class="form-control">
+            <option value="" data-locale="UI_PERMISSIONS_ROLE_NONE">No Role</option>
+            <option value="staff" data-locale="UI_PERMISSIONS_ROLE_STAFF">Staff</option>
+            <option value="manager" data-locale="UI_PERMISSIONS_ROLE_MANAGER">Manager</option>
+            <option value="owner" data-locale="UI_PERMISSIONS_ROLE_OWNER">Owner</option>
+          </select>
+        </div>
+        
+        <div class="edit-role-warning">
+          <p><strong><i class="fas fa-exclamation-triangle"></i> <span data-locale="UI_NOTE">Note:</span></strong> <span data-locale="UI_EDIT_ROLE_WARNING">Changing roles will affect user permissions immediately.</span></p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="editRoleCancel" data-locale="UI_CANCEL">Cancel</button>
+        <button class="btn btn-primary" id="editRoleConfirm" data-locale="UI_PERMISSIONS_UPDATE_ROLE">Update Role</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Transcript Viewer Modal -->
+  <div id="transcriptViewerModal" class="modal hidden">
+    <div class="modal-card transcript-modal">
+      <div class="modal-head">
+        <div class="title">
+          <i class="fas fa-comments"></i> Chat Transcript - Session <span id="transcriptSessionId">-</span>
+        </div>
+        <button class="icon-btn" id="transcriptViewerModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body transcript-modal-body">
+        <div class="transcript-info">
+          <div class="transcript-info-row">
+            <strong>Player:</strong> <span id="transcriptPlayerName">-</span>
+          </div>
+          <div class="transcript-info-row">
+            <strong>Session ID:</strong> <span id="transcriptSessionIdValue">-</span>
+          </div>
+          <div class="transcript-info-row">
+            <strong>Created:</strong> <span id="transcriptCreatedAt">-</span>
+          </div>
+          <div class="transcript-info-row">
+            <strong>Messages:</strong> <span id="transcriptMessageCount">-</span>
+          </div>
+        </div>
+        
+        <div class="transcript-messages-container">
+          <div class="ai-chat-messages transcript-messages" id="transcriptMessages">
+            <div class="loading-state">
+              <i class="fas fa-spinner fa-spin"></i> Loading messages...
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-danger hidden" id="transcriptDeleteBtn" data-locale="UI_TRANSCRIPT_DELETE_BUTTON">Delete Transcript</button>
+        <button class="btn btn-secondary" id="transcriptViewerClose" data-locale="UI_BUTTON_CLOSE">Close</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <div id="wizardModal" class="modal hidden">
+    <div class="modal-card">
+      <div class="modal-head">
+        <div class="title"><i class="fas fa-bullseye"></i> <span data-locale="UI_CREATE_WIZARD_TITLE">Create Redeem Code - Wizard</span></div>
+        <button class="icon-btn" id="wizardModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      
+      
+      <div class="wizard-steps">
+        <div class="step active" data-step="1">
+          <div class="step-number">1</div>
+          <div class="step-label" data-locale="UI_WIZARD_STEP_LABEL_BASIC">Basic Info</div>
+        </div>
+        <div class="step" data-step="2">
+          <div class="step-number">2</div>
+          <div class="step-label" data-locale="UI_WIZARD_STEP_LABEL_EXPIRY">Expiry & Limits</div>
+        </div>
+        <div class="step" data-step="3">
+          <div class="step-number">3</div>
+          <div class="step-label" data-locale="UI_WIZARD_STEP_LABEL_TIME">Time Restrictions</div>
+        </div>
+        <div class="step" data-step="4">
+          <div class="step-number">4</div>
+          <div class="step-label" data-locale="UI_WIZARD_STEP_LABEL_REWARDS">Rewards</div>
+        </div>
+        <div class="step" data-step="5">
+          <div class="step-number">5</div>
+          <div class="step-label" data-locale="UI_WIZARD_STEP_GENERATE">Generate</div>
+        </div>
+      </div>
+      
+      <div class="modal-body">
+        
+        <div id="wizard-step-1" class="wizard-step-content active">
+          <div class="step-header">
+            <h3><i class="fas fa-bullseye"></i> <span data-locale="UI_WIZARD_BASIC_INFO">Basic Information</span></h3>
+            <p data-locale="UI_WIZARD_BASIC_INFO_DESC">Set up the foundation for your redeem code</p>
+          </div>
+          
+          <div class="form-section">
+            <div id="custom-code-section" class="form-row">
+              <label data-locale="UI_CUSTOM_CODE_LABEL">Custom Code</label> <span class="required">*</span>
+              <div class="custom-code-input-group">
+                <input type="text" id="wizardCustomCode" class="input" placeholder="" minlength="1" maxlength="60" data-locale-placeholder="UI_WIZARD_CUSTOM_CODE_PLACEHOLDER">
+                <button class="btn btn-xs" id="copyCustomCode" data-locale="UI_COPY_CODE" title="Copy Code">
+                  <i class="fas fa-copy"></i> <span data-locale="UI_COPY_CODE">Copy Code</span>
+                </button>
+              </div>
+              <div class="input-help" data-locale="UI_WIZARD_CUSTOM_CODE_HELP">Loading...</div>
+            </div>
+          </div>
+        </div>
+        
+        
+        <div id="wizard-step-2" class="wizard-step-content">
+          <div class="step-header">
+            <h3><i class="fas fa-cog"></i> <span data-locale="UI_WIZARD_EXPIRY_LIMITS">Expiry & Limits</span></h3>
+            <p data-locale="UI_WIZARD_EXPIRY_LIMITS_DESC">Configure when the code expires and usage restrictions</p>
+          </div>
+          
+          <div class="form-section">
+            <div class="form-row">
+              <label data-locale="UI_WIZARD_EXPIRY_SETTINGS">Expiry Settings</label>
+              <div class="expiry-selector">
+                <button class="expiry-btn active" data-expiry="never">
+                  <span class="expiry-icon"><i class="fas fa-infinity"></i></span>
+                  <span class="expiry-text" data-locale="UI_WIZARD_EXPIRY_NEVER">Never Expires</span>
+                </button>
+                <button class="expiry-btn" data-expiry="relative">
+                  <span class="expiry-icon"><i class="fas fa-clock"></i></span>
+                  <span class="expiry-text" data-locale="UI_WIZARD_EXPIRY_RELATIVE">Relative Time</span>
+                </button>
+                <button class="expiry-btn" data-expiry="specific">
+                  <span class="expiry-icon"><i class="fas fa-calendar"></i></span>
+                  <span class="expiry-text" data-locale="UI_WIZARD_EXPIRY_SPECIFIC">Specific Date</span>
+                </button>
+              </div>
+            </div>
+            
+            
+            <div id="relative-expiry-section" class="form-row hidden">
+              <label data-locale="UI_WIZARD_TIME_DURATION">Time Duration</label>
+              <div class="time-inputs">
+                <input type="number" id="relativeHours" class="input" min="1" value="24" placeholder="Hours">
+                <span class="time-separator" data-locale="UI_WIZARD_HOURS">hours</span>
+              </div>
+            </div>
+            
+            
+            <div id="specific-expiry-section" class="form-row hidden">
+              <label data-locale="UI_EXPIRY_DATETIME">Expiry Date & Time</label>
+              <input type="datetime-local" id="specificExpiry" class="input">
+            </div>
+            
+            <div class="form-grid">
+              <div class="form-row">
+                <label><span data-locale="UI_WIZARD_TOTAL_USES">Total Uses</span> <span class="required">*</span></label>
+                <input id="wizardUses" class="input" type="number" min="0" value="1" placeholder="1" aria-label="Uses" data-locale-placeholder="UI_MODAL_CREATE_USES">
+                <small class="form-hint" data-locale="UI_WIZARD_USES_HINT">Enter 0 for unlimited uses</small>
+              </div>
+              
+              <div class="form-row">
+                <label><span data-locale="UI_WIZARD_PER_USER_LIMIT">Per-User Limit</span> <span class="required">*</span></label>
+                <input id="wizardPerUser" class="input" type="number" min="0" value="1" placeholder="1" aria-label="Per-User Limit" data-locale-placeholder="UI_MODAL_CREATE_PER_USER_LIMIT">
+                <small class="form-hint" data-locale="UI_WIZARD_PER_USER_HINT">Enter 0 for unlimited per user</small>
+              </div>
+            </div>
+            <div class="form-row">
+              <label class="checkbox-label">
+                <input type="checkbox" id="wizardRestrictToPlayerEnabled" class="checkbox-input">
+                <span data-locale="UI_WIZARD_RESTRICT_TO_PLAYER">Restrict to specific player</span>
+              </label>
+            </div>
+            <div id="wizardPlayerRestrictionSection" class="form-grid hidden">
+              <div class="form-row">
+                <label data-locale="UI_WIZARD_IDENTIFIER_TYPE">Identifier Type</label>
+                <select id="wizardPlayerIdentifierType" class="input">
+                  <option value="citizenid">Citizen ID</option>
+                  <option value="characterid">Character ID</option>
+                  <option value="license">License</option>
+                  <option value="license2">License2</option>
+                </select>
+              </div>
+              <div class="form-row">
+                <label data-locale="UI_WIZARD_IDENTIFIER_VALUE">Identifier Value</label>
+                <input id="wizardPlayerIdentifierValue" class="input" type="text" placeholder="e.g. license2:xxxxxxxx">
+                <small class="form-hint" data-locale="UI_WIZARD_IDENTIFIER_VALUE_HINT">Enter the exact identifier for the selected type.</small>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        <div id="wizard-step-3" class="wizard-step-content">
+          <div class="step-header">
+            <h3><i class="fas fa-clock"></i> <span data-locale="UI_WIZARD_TIME_RESTRICTIONS">Time Restrictions</span></h3>
+            <p data-locale="UI_WIZARD_TIME_RESTRICTIONS_DESC">Would you like to add time-based restrictions to your code?</p>
+          </div>
+          
+          <div class="form-section">
+              <div class="time-restrictions-intro">
+              <div class="intro-card">
+                <div class="intro-icon"><i class="fas fa-clock"></i></div>
+                <div class="intro-content">
+                  <h4 data-locale="UI_WIZARD_TIME_RESTRICTIONS">Time Restrictions</h4>
+                  <p data-locale="UI_WIZARD_TIME_INTRO">Control when your code can be redeemed with flexible time-based rules</p>
+                </div>
+              </div>
+              
+              <div class="enable-toggle">
+                <button type="button" class="btn-toggle-restrictions" id="wizardTimeRestrictionsEnabled">
+                  <span class="btn-toggle-text" data-locale="UI_WIZARD_ENABLE_TIME">Enable Time Restrictions</span>
+                  <span class="btn-toggle-text-selected" data-locale="UI_SELECTED">Selected</span>
+                </button>
+                <div class="toggle-label">
+                  <h4 data-locale="UI_WIZARD_ENABLE_TIME">Enable Time Restrictions</h4>
+                  <p data-locale="UI_WIZARD_ENABLE_TIME_DESC">Add time-based limitations to when this code can be redeemed</p>
+                </div>
+              </div>
+            </div>
+            
+            <div id="wizardTimeRestrictionsSection" class="time-restrictions-section" style="display: none;">
+              <div class="restriction-type-selector">
+                <h4 data-locale="UI_WIZARD_CHOOSE_RESTRICTION">Choose Restriction Type</h4>
+                <div class="restriction-options">
+                  <div class="restriction-option" data-type="daily_hours">
+                    <div class="option-icon"><i class="fas fa-calendar-day"></i></div>
+                    <div class="option-content">
+                      <h5 data-locale="UI_WIZARD_DAILY_HOURS">Daily Hours</h5>
+                      <p data-locale="UI_WIZARD_DAILY_HOURS_DESC">Available during specific hours each day</p>
+                    </div>
+                  </div>
+                  <div class="restriction-option" data-type="weekly_days">
+                    <div class="option-icon"><i class="fas fa-calendar-week"></i></div>
+                    <div class="option-content">
+                      <h5 data-locale="UI_WIZARD_WEEKLY_DAYS">Weekly Days</h5>
+                      <p data-locale="UI_WIZARD_WEEKLY_DAYS_DESC">Available on specific days of the week</p>
+                    </div>
+                  </div>
+                  <div class="restriction-option" data-type="specific_dates">
+                    <div class="option-icon"><i class="fas fa-calendar"></i></div>
+                    <div class="option-content">
+                      <h5 data-locale="UI_WIZARD_SPECIFIC_DATES">Specific Dates</h5>
+                      <p data-locale="UI_WIZARD_SPECIFIC_DATES_DESC">Available on exact dates</p>
+                    </div>
+                  </div>
+                  <div class="restriction-option" data-type="recurring">
+                    <div class="option-icon"><i class="fas fa-sync-alt"></i></div>
+                    <div class="option-content">
+                      <h5 data-locale="UI_WIZARD_RECURRING">Recurring</h5>
+                      <p data-locale="UI_WIZARD_RECURRING_DESC">Custom recurring patterns</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="restriction-config">
+                <div id="wizardDailyHoursSection" class="restriction-type-section">
+                  <h4 data-locale="UI_WIZARD_DAILY_HOURS_CONFIG">Daily Hours Configuration</h4>
+                  <div class="time-range-selector">
+                    <div class="time-input-group">
+                      <label for="wizardStartHour" data-locale="UI_WIZARD_START_TIME">Start Time</label>
+                      <input type="time" id="wizardStartHour" class="input" value="09:00">
+                    </div>
+                    <div class="time-separator" data-locale="UI_WIZARD_TO">to</div>
+                    <div class="time-input-group">
+                      <label for="wizardEndHour" data-locale="UI_WIZARD_END_TIME">End Time</label>
+                      <input type="time" id="wizardEndHour" class="input" value="17:00">
+                    </div>
+                  </div>
+                </div>
+                
+                <div id="wizardWeeklyDaysSection" class="restriction-type-section">
+                  <h4 data-locale="UI_WIZARD_WEEKLY_DAYS_CONFIG">Weekly Days Configuration</h4>
+                  <div class="day-checkboxes">
+                    <label class="day-checkbox">
+                      <input type="checkbox" value="1">
+                      <span class="day-name" data-locale="UI_DAY_MONDAY">Monday</span>
+                    </label>
+                    <label class="day-checkbox">
+                      <input type="checkbox" value="2">
+                      <span class="day-name" data-locale="UI_DAY_TUESDAY">Tuesday</span>
+                    </label>
+                    <label class="day-checkbox">
+                      <input type="checkbox" value="3">
+                      <span class="day-name" data-locale="UI_DAY_WEDNESDAY">Wednesday</span>
+                    </label>
+                    <label class="day-checkbox">
+                      <input type="checkbox" value="4">
+                      <span class="day-name" data-locale="UI_DAY_THURSDAY">Thursday</span>
+                    </label>
+                    <label class="day-checkbox">
+                      <input type="checkbox" value="5">
+                      <span class="day-name" data-locale="UI_DAY_FRIDAY">Friday</span>
+                    </label>
+                    <label class="day-checkbox">
+                      <input type="checkbox" value="6">
+                      <span class="day-name" data-locale="UI_DAY_SATURDAY">Saturday</span>
+                    </label>
+                    <label class="day-checkbox">
+                      <input type="checkbox" value="7">
+                      <span class="day-name" data-locale="UI_DAY_SUNDAY">Sunday</span>
+                    </label>
+                  </div>
+                </div>
+                
+                <div id="wizardSpecificDatesSection" class="restriction-type-section">
+                  <h4 data-locale="UI_WIZARD_SPECIFIC_DATES_CONFIG">Specific Dates Configuration</h4>
+                  <div class="date-input-container">
+                    <div class="date-input-row">
+                      <input type="date" class="input" placeholder="Select date">
+                      <button type="button" class="btn btn-secondary remove-date" data-locale="UI_REMOVE">Remove</button>
+                    </div>
+                  </div>
+                  <button type="button" class="btn btn-outline add-date" data-locale="UI_ADD_DATE">+ Add Date</button>
+                </div>
+                
+                <div id="wizardRecurringSection" class="restriction-type-section">
+                  <h4 data-locale="UI_WIZARD_RECURRING_CONFIG">Recurring Configuration</h4>
+                  <div class="recurring-config">
+                    <div class="input-group">
+                      <label data-locale="UI_WIZARD_RECURRING_TYPE">Recurring Type</label>
+                      <select id="wizardRecurringType" class="input">
+                        <option value="daily" data-locale="UI_RECURRING_DAILY">Daily</option>
+                        <option value="weekly" data-locale="UI_RECURRING_WEEKLY">Weekly</option>
+                        <option value="monthly" data-locale="UI_RECURRING_MONTHLY">Monthly</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <label data-locale="UI_WIZARD_RECURRING_PATTERN">Pattern</label>
+                      <input type="text" id="wizardRecurringPattern" class="input" placeholder="e.g., Every 2 days">
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="custom-message-section">
+                  <h4 data-locale="UI_WIZARD_CUSTOM_MESSAGE">Custom Message</h4>
+                  <textarea id="wizardTimeRestrictionsMessage" class="input" placeholder="Enter a custom message to show users when they try to redeem this code outside the allowed time restrictions (e.g., 'This code is only available on weekdays' or 'Available during business hours 9 AM - 5 PM')"></textarea>
+                </div>
+                
+                <div class="cycle-limit-section">
+                  <div class="cycle-toggle">
+                    <label class="toggle-switch">
+                      <input type="checkbox" id="wizardCycleBasedLimit">
+                      <span class="toggle-slider"></span>
+                    </label>
+                    <div class="cycle-content">
+                      <h4 data-locale="UI_WIZARD_CYCLE_BASED_LIMIT">Reset User Limit After Each Cycle</h4>
+                      <p data-locale="UI_WIZARD_CYCLE_BASED_LIMIT_DESC">When enabled, the per-user redemption limit will reset after each time restriction cycle (e.g., daily, weekly)</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        
+        <div id="wizard-step-4" class="wizard-step-content">
+          <div class="step-header">
+            <h3><i class="fas fa-gift"></i> <span data-locale="UI_WIZARD_REWARDS">Rewards</span></h3>
+            <p data-locale="UI_WIZARD_REWARDS_DESC">Choose from templates or build custom rewards</p>
+          </div>
+          
+          <div class="form-section">
+            
+              <div class="wizard-rewards-table">
+              <h4 data-locale="UI_WIZARD_CURRENT_REWARDS">Current Rewards</h4>
+                <div class="rewards-summary" id="rewardsSummary">
+                  <div class="summary-stats">
+                    <span class="stat-item">
+                      <span class="stat-label" data-locale="UI_WIZARD_TOTAL_ITEMS">Total Items:</span>
+                      <span class="stat-value" id="totalItems">0</span>
+                    </span>
+                    <span class="stat-item">
+                      <span class="stat-label" data-locale="UI_WIZARD_TOTAL_MONEY">Total Money:</span>
+                      <span class="stat-value" id="totalMoney">$0</span>
+                    </span>
+                    <span class="stat-item">
+                      <span class="stat-label" data-locale="UI_WIZARD_TOTAL_VEHICLES">Vehicles:</span>
+                      <span class="stat-value" id="totalVehicles">0</span>
+                    </span>
+                  </div>
+                </div>
+                <table id="wizardRewardsTable">
+                  <thead>
+                    <tr>
+                      <th data-locale="UI_WIZARD_REWARD_TYPE">Type</th>
+                      <th data-locale="UI_WIZARD_REWARD_NAME">Name/Model</th>
+                      <th data-locale="UI_WIZARD_REWARD_AMOUNT">Amount</th>
+                      <th data-locale="UI_ACTION">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="wizardRewardsTbody">
+                  
+                  </tbody>
+                </table>
+              </div>
+            
+            
+            <div class="manual-reward-section">
+              <h4 data-locale="UI_WIZARD_MANUAL_REWARD">Manual Reward Entry</h4>
+              <div class="reward-builder">
+                <div class="reward-inputs">
+                  <select id="wizardRewardType" class="reward-type-select">
+                    <option value="item" data-locale="UI_WIZARD_REWARD_ITEM">Item</option>
+                    <option value="money" data-locale="UI_WIZARD_REWARD_MONEY">Money</option>
+                    <option value="vehicle" data-locale="UI_WIZARD_REWARD_VEHICLE">Vehicle</option>
+                  </select>
+                  <input type="text" id="wizardRewardName" class="reward-name-input" placeholder="Item spawn name or vehicle model">
+                  <input type="text" id="wizardRewardLabel" class="reward-label-input" placeholder="Display label (e.g. Water Bottle)">
+                  <input type="number" id="wizardRewardAmount" class="reward-amount-input" min="1" value="1">
+                  <button class="btn btn-secondary" id="wizardAddReward" data-locale="UI_WIZARD_ADD_REWARD">Add Reward</button>
+            </div>
+          </div>
+        </div>
+        
+            
+            <div class="template-section">
+              <h4 data-locale="UI_WIZARD_QUICK_TEMPLATES">Quick Templates</h4>
+              <div class="template-categories">
+                <div class="category-tabs" id="categoryTabs">
+                  
+                </div>
+                <div class="template-grid" id="templateGrid">
+                  
+                </div>
+              </div>
+            </div>
+            
+            
+            <div class="template-section">
+              <h4 data-locale="UI_WIZARD_SAVED_TEMPLATES">Saved Templates</h4>
+              <div class="saved-templates-container">
+                <div class="saved-templates-grid" id="savedTemplates">
+                  
+                </div>
+              </div>
+            </div>
+            
+
+          </div>
+        </div>
+        
+        
+        <div id="wizard-step-5" class="wizard-step-content">
+          <div class="step-header">
+            <h3><i class="fas fa-rocket"></i> <span data-locale="UI_WIZARD_GENERATE_SHARE">Generate & Share</span></h3>
+            <p data-locale="UI_WIZARD_GENERATE_REVIEW">Review your code and generate it</p>
+          </div>
+          
+          <div class="form-section">
+            <div class="code-summary">
+              <h4 data-locale="UI_WIZARD_CODE_SUMMARY">Code Summary</h4>
+              <div class="summary-grid">
+                <div class="summary-item">
+                  <span class="summary-label" data-locale="UI_SUMMARY_CODE">Code:</span>
+                  <div class="summary-code-container">
+                    <span class="summary-value" id="summaryCode">-</span>
+                    <button class="btn btn-xs" id="copySummaryCode" data-locale="UI_COPY_CODE" title="Copy Code">
+                      <i class="fas fa-copy"></i> <span data-locale="UI_COPY_CODE">Copy Code</span>
+                    </button>
+                  </div>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label" data-locale="UI_SUMMARY_USES">Uses:</span>
+                  <span class="summary-value" id="summaryUses">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label" data-locale="UI_SUMMARY_PER_USER">Per-User Limit:</span>
+                  <span class="summary-value" id="summaryPerUser">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label" data-locale="UI_SUMMARY_EXPIRY">Expiry:</span>
+                  <span class="summary-value" id="summaryExpiry">-</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label" data-locale="UI_SUMMARY_REWARDS">Rewards:</span>
+                  <span class="summary-value" id="summaryRewards">-</span>
+                </div>
+                <div class="summary-item" id="summaryTimeRestrictions" style="display: none;">
+                  <span class="summary-label" data-locale="UI_SUMMARY_TIME_RESTRICTIONS">Time Restrictions:</span>
+                  <span class="summary-value" id="summaryTimeRestrictionsValue">-</span>
+                </div>
+                <div class="summary-item" id="summaryCycleLimit" style="display: none;">
+                  <span class="summary-label" data-locale="UI_SUMMARY_CYCLE_LIMIT">Cycle-Based User Limit:</span>
+                  <span class="summary-value" id="summaryCycleLimitValue">-</span>
+                </div>
+                <div class="summary-item" id="summaryPlayerRestriction">
+                  <span class="summary-label" data-locale="UI_SUMMARY_PLAYER_RESTRICTION">Player Restriction:</span>
+                  <span class="summary-value" id="summaryPlayerRestrictionValue">Anyone</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="template-save">
+              <h4 data-locale="UI_SAVE_AS_TEMPLATE">Save as Template</h4>
+              <div class="template-save-form">
+                <input type="text" id="templateName" class="input" placeholder="Template name (optional)">
+                <button class="btn btn-secondary" id="saveTemplate" data-locale="UI_SAVE_TEMPLATE">Save Template</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <div class="wizard-navigation">
+          <button class="btn btn-secondary" id="wizardPrev" disabled data-locale="UI_PREVIOUS"><i class="fas fa-arrow-left"></i> Previous</button>
+          <button class="btn btn-secondary" id="wizardNext" data-locale="UI_NEXT">Next <i class="fas fa-arrow-left"></i></button>
+          <button class="btn btn-primary" id="wizardGenerate" style="display: none;" data-locale="UI_GENERATE_CODE">Generate Code</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+  <div id="bulkConfirmModal" class="modal hidden">
+    <div class="modal-card bulk-confirm-modal">
+      <div class="modal-head">
+        <div class="title" data-locale="UI_BULK_CONFIRM_TITLE">Confirm Bulk Generation</div>
+        <button class="icon-btn" id="bulkConfirmModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="bulk-confirm-content">
+          <div class="confirm-icon"><i class="fas fa-bullseye"></i></div>
+          <h3 data-locale="UI_BULK_CONFIRM_DESC">Are you sure you want to generate these codes?</h3>
+          <p data-locale="UI_BULK_CONFIRM_SUMMARY">This will create <strong id="bulkConfirmAmount">0</strong> unique codes with the specified settings.</p>
+          
+          <div class="bulk-confirm-details">
+            <div class="confirm-row">
+              <strong data-locale="UI_BULK_CONFIRM_PATTERN">Pattern:</strong> <span id="bulkConfirmPattern">Unknown</span>
+            </div>
+            <div class="confirm-row">
+              <strong data-locale="UI_BULK_CONFIRM_USES">Uses per Code:</strong> <span id="bulkConfirmUses">Unknown</span>
+            </div>
+            <div class="confirm-row">
+              <strong data-locale="UI_BULK_CONFIRM_PER_USER">Per-User Limit:</strong> <span id="bulkConfirmPerUser">Unknown</span>
+            </div>
+            <div class="confirm-row">
+                              <strong data-locale="UI_BULK_CONFIRM_EXPIRY">Expiry:</strong> <span id="bulkConfirmExpiry">Unknown</span>
+            </div>
+            <div class="confirm-row">
+              <strong data-locale="UI_BULK_CONFIRM_REWARDS">Rewards:</strong> <span id="bulkConfirmRewards">Unknown</span>
+            </div>
+          </div>
+          
+          <div class="bulk-confirm-warning">
+            <p><strong><i class="fas fa-exclamation-triangle"></i> <span data-locale="UI_BULK_CONFIRM_WARNING">Warning:</span></strong> <span data-locale="UI_BULK_CONFIRM_WARNING_DESC">This action cannot be undone. All generated codes will be immediately available for use.</span></p>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="bulkConfirmCancel" data-locale="UI_CANCEL">Cancel</button>
+        <button class="btn btn-primary" id="bulkConfirmProceed" data-locale="UI_GENERATE_CODES">Generate Codes</button>
+      </div>
+    </div>
+  </div>
+
+  
+  <div id="bulkGenerateModal" class="modal hidden">
+    <div class="modal-card bulk-generate-modal">
+      <div class="modal-head">
+        <div class="title"><i class="fas fa-bullseye"></i> <span data-locale="UI_BULK_MODAL_TITLE">Bulk Code Generation</span></div>
+        <button class="icon-btn" id="bulkGenerateModalClose"><i class="fas fa-times"></i></button>
+      </div>
+      <div class="modal-body">
+        <div class="bulk-generate-content">
+          
+            <div class="step-nav">
+            <div class="step active" data-step="1">
+              <span class="step-number">1</span>
+              <span class="step-label" data-locale="UI_BULK_STEP_BASIC">Basic</span>
+            </div>
+            <div class="step" data-step="2">
+              <span class="step-number">2</span>
+              <span class="step-label" data-locale="UI_BULK_STEP_SETTINGS">Settings</span>
+            </div>
+            <div class="step" data-step="3">
+              <span class="step-number">3</span>
+              <span class="step-label" data-locale="UI_BULK_STEP_TIME">Time</span>
+            </div>
+            <div class="step" data-step="4">
+              <span class="step-number">4</span>
+              <span class="step-label" data-locale="UI_BULK_STEP_REWARDS">Rewards</span>
+            </div>
+            <div class="step" data-step="5">
+              <span class="step-number">5</span>
+              <span class="step-label" data-locale="UI_BULK_STEP_PREVIEW">Preview</span>
+            </div>
+          </div>
+
+          
+          <div class="step-content active" id="step1">
+            <h3 data-locale="UI_BULK_STEP_1_TITLE">Basic Settings</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="bulkAmount" data-locale="UI_BULK_AMOUNT_LABEL">Amount of Codes</label>
+                <input type="number" id="bulkAmount" class="input" min="1" max="10000" value="100" placeholder="1-10,000" onchange="updatePreview()" data-locale-placeholder="UI_BULK_AMOUNT_PLACEHOLDER">
+              </div>
+              <div class="form-group">
+                <label for="bulkPattern" data-locale="UI_BULK_PATTERN_LABEL">Code Pattern</label>
+                <div class="pattern-container">
+                  <input type="text" id="bulkPattern" class="input" value="CODE-{RANDOM:6}" placeholder="e.g., VIP-{RANDOM:6}" onchange="updatePreview()" data-locale-placeholder="UI_BULK_PATTERN_PLACEHOLDER">
+                  <button type="button" class="btn btn-sm" onclick="showPatternHelp()" data-locale="UI_BULK_PATTERN_HELP">?</button>
+                </div>
+                <div class="pattern-preview" id="bulkPatternPreview">
+                  <span class="preview-label" data-locale="UI_BULK_PREVIEW_LABEL">Preview:</span>
+                  <div class="preview-codes">
+                    <span class="preview-code" data-locale="UI_BULK_PREVIEW_CODE_1">CODE-ABC123</span>
+                    <span class="preview-code" data-locale="UI_BULK_PREVIEW_CODE_2">CODE-XYZ789</span>
+                    <span class="preview-code" data-locale="UI_BULK_PREVIEW_CODE_3">CODE-DEF456</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="step-content" id="step2">
+            <h3 data-locale="UI_BULK_SETTINGS_SECTION">Code Settings</h3>
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="bulkUses" data-locale="UI_BULK_GENERATION_USES">Uses per Code</label>
+                <input type="number" id="bulkUses" class="input" min="1" value="1" onchange="updatePreview()">
+              </div>
+              <div class="form-group">
+                <label for="bulkPerUser" data-locale="UI_BULK_GENERATION_PER_USER">Per-User Limit</label>
+                <input type="number" id="bulkPerUser" class="input" min="1" value="1" onchange="updatePreview()">
+              </div>
+              <div class="form-group">
+                <label for="bulkExpiry" data-locale="UI_EXPIRY_DATETIME">Expiry Date & Time</label>
+                <input type="datetime-local" id="bulkExpiry" class="input" onchange="updatePreview()">
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="step-content" id="step3">
+            <h3 data-locale="UI_WIZARD_TIME_RESTRICTIONS">Time Restrictions</h3>
+            <div class="form-group">
+              <label class="checkbox-label">
+                <input type="checkbox" id="bulkTimeRestrictionsEnabled" class="checkbox-input" onchange="toggleTimeRestrictions()">
+                <span data-locale="UI_WIZARD_ENABLE_TIME">Enable time restrictions</span>
+              </label>
+            </div>
+            <div class="time-restrictions" id="timeRestrictionsRow" style="display: none;">
+              <div class="time-inputs">
+                <div class="form-group">
+                  <label for="bulkStartTime" data-locale="UI_WIZARD_START_TIME">Start Time</label>
+                  <input type="time" id="bulkStartTime" class="input" value="09:00" onchange="updatePreview()">
+                </div>
+                <div class="form-group">
+                  <label for="bulkEndTime" data-locale="UI_WIZARD_END_TIME">End Time</label>
+                  <input type="time" id="bulkEndTime" class="input" value="17:00" onchange="updatePreview()">
+                </div>
+              </div>
+              <div class="day-selection">
+                <label data-locale="UI_BULK_AVAILABLE_DAYS">Available Days</label>
+                <div class="day-checkboxes">
+                  <label class="day-checkbox">
+                    <input type="checkbox" id="bulkDayMon" value="monday" checked onchange="updatePreview()">
+                    <span data-locale="UI_DAY_MON_SHORT">Mon</span>
+                  </label>
+                  <label class="day-checkbox">
+                    <input type="checkbox" id="bulkDayTue" value="tuesday" checked onchange="updatePreview()">
+                    <span data-locale="UI_DAY_TUE_SHORT">Tue</span>
+                  </label>
+                  <label class="day-checkbox">
+                    <input type="checkbox" id="bulkDayWed" value="wednesday" checked onchange="updatePreview()">
+                    <span data-locale="UI_DAY_WED_SHORT">Wed</span>
+                  </label>
+                  <label class="day-checkbox">
+                    <input type="checkbox" id="bulkDayThu" value="thursday" checked onchange="updatePreview()">
+                    <span data-locale="UI_DAY_THU_SHORT">Thu</span>
+                  </label>
+                  <label class="day-checkbox">
+                    <input type="checkbox" id="bulkDayFri" value="friday" checked onchange="updatePreview()">
+                    <span data-locale="UI_DAY_FRI_SHORT">Fri</span>
+                  </label>
+                  <label class="day-checkbox">
+                    <input type="checkbox" id="bulkDaySat" value="saturday" onchange="updatePreview()">
+                    <span data-locale="UI_DAY_SAT_SHORT">Sat</span>
+                  </label>
+                  <label class="day-checkbox">
+                    <input type="checkbox" id="bulkDaySun" value="sunday" onchange="updatePreview()">
+                    <span data-locale="UI_DAY_SUN_SHORT">Sun</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="step-content" id="step4">
+            <h3 data-locale="UI_WIZARD_REWARDS">Rewards</h3>
+            <div class="rewards-container">
+              <div class="rewards-list" id="bulkRewardsList">
+                <div class="reward-item">
+                  <select class="reward-type" onchange="toggleRewardFields(this); updatePreview()">
+                    <option value="item" data-locale="UI_WIZARD_REWARD_ITEM">Item</option>
+                    <option value="money" data-locale="UI_WIZARD_REWARD_MONEY">Money</option>
+                    <option value="vehicle" data-locale="UI_WIZARD_REWARD_VEHICLE">Vehicle</option>
+                  </select>
+                  <input type="text" class="reward-name" placeholder="Item name / Vehicle model" onchange="updatePreview()" data-locale-placeholder="UI_WIZARD_REWARD_NAME_PLACEHOLDER">
+                  <input type="text" class="reward-amount" value="" placeholder="Amount" onchange="updatePreview()" data-locale-placeholder="UI_WIZARD_REWARD_AMOUNT_PLACEHOLDER">
+                  <button type="button" class="btn btn-sm remove-reward" onclick="removeRewardItem(this); updatePreview()" data-locale="UI_REMOVE">Remove</button>
+                </div>
+              </div>
+              <button type="button" class="btn btn-secondary add-reward-btn" onclick="addRewardItem(); updatePreview()">
+                <span>+</span> <span data-locale="UI_WIZARD_ADD_REWARD">Add Reward</span>
+              </button>
+            </div>
+          </div>
+
+          
+          <div class="step-content" id="step5">
+            <h3 data-locale="UI_PREVIEW_GENERATE">Preview & Generate</h3>
+            <div class="preview-section">
+              <div class="preview-card">
+                <h4 data-locale="UI_BULK_GENERATION_SUMMARY">Generation Summary</h4>
+                <div class="preview-details">
+                  <div class="preview-item">
+                    <span class="label" data-locale="UI_BULK_PREVIEW_AMOUNT">Amount:</span>
+                    <span class="value" id="previewAmount">100</span>
+                  </div>
+                  <div class="preview-item">
+                    <span class="label" data-locale="UI_BULK_PREVIEW_PATTERN">Pattern:</span>
+                    <span class="value" id="previewPattern">CODE-{RANDOM:6}</span>
+                  </div>
+                  <div class="preview-item">
+                    <span class="label" data-locale="UI_BULK_PREVIEW_USES">Uses per Code:</span>
+                    <span class="value" id="previewUses">1</span>
+                  </div>
+                  <div class="preview-item">
+                    <span class="label" data-locale="UI_BULK_PREVIEW_PER_USER">Per-User Limit:</span>
+                    <span class="value" id="previewPerUser">1</span>
+                  </div>
+                  <div class="preview-item">
+                    <span class="label" data-locale="UI_BULK_PREVIEW_EXPIRY">Expiry:</span>
+                    <span class="value" id="previewExpiry">Never</span>
+                  </div>
+                  <div class="preview-item">
+                    <span class="label" data-locale="UI_BULK_PREVIEW_TIME">Time Restrictions:</span>
+                    <span class="value" id="previewTimeRestrictions">None</span>
+                  </div>
+                  <div class="preview-item">
+                    <span class="label" data-locale="UI_BULK_PREVIEW_REWARDS">Rewards:</span>
+                    <div class="value" id="previewRewards">None</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          
+          <div class="progress-section hidden" id="bulkProgressSection">
+            <div class="progress-header">
+              <h3 data-locale="UI_BULK_PROGRESS_TITLE">Generating Codes...</h3>
+              <div class="progress-bar">
+                <div class="progress-fill" id="bulkProgressBar" style="width: 0%"></div>
+              </div>
+              <div class="progress-info">
+                <span id="bulkProgressText" data-locale="UI_BULK_PROGRESS_STATUS">0% Complete</span>
+                <span id="bulkProgressCount" data-locale="UI_BULK_PROGRESS_CODES">(0 / 0 codes)</span>
+              </div>
+            </div>
+            <div class="progress-status" id="bulkProgressStatus" data-locale="UI_BULK_PROGRESS_PREPARING">Preparing to generate codes...</div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <div class="step-navigation">
+          <button class="btn btn-secondary" id="prevStep" onclick="prevBulkStep()" style="display: none;" data-locale="UI_PREVIOUS">Previous</button>
+          <button class="btn btn-secondary" id="bulkGenerateCancel" data-locale="UI_CANCEL">Cancel</button>
+          <button class="btn btn-primary" id="nextStep" onclick="nextBulkStep()" data-locale="UI_NEXT">Next</button>
+          <button class="btn btn-primary" id="bulkGenerateConfirm" style="display: none;" data-locale="UI_GENERATE_CODES">Generate Codes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="runtime_config_editors.js?v=1"></script>
+  <script src="app.js?v=255"></script>
+  
+  <style>
+    .bulk-generate-modal {
+      max-width: 800px;
+      width: 90vw;
+    }
+
+    .bulk-generate-content {
+      padding: 0;
+    }
+
+    .bulk-generate-modal .step-nav {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 30px;
+      padding: 0 20px;
+    }
+
+    .bulk-generate-modal .step {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      border-radius: 25px;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .bulk-generate-modal .step.active {
+      background: #007bff !important;
+      color: white !important;
+    }
+
+    .bulk-generate-modal .step.completed {
+      background: white !important;
+      color: #007bff !important;
+      border: 2px solid #007bff !important;
+    }
+
+    .bulk-generate-modal .step-number {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .bulk-generate-modal .step.active .step-number {
+      background: rgba(255, 255, 255, 0.3) !important;
+    }
+
+    .bulk-generate-modal .step.completed .step-number {
+      background: #007bff !important;
+      color: white !important;
+    }
+
+    .bulk-generate-modal .step-content {
+      display: none;
+      padding: 0 20px;
+      min-height: 400px;
+    }
+
+    .bulk-generate-modal .step-content.active {
+      display: block;
+    }
+
+    .bulk-generate-modal .step-content h3 {
+      margin: 0 0 20px 0;
+      color: var(--text-primary);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-group label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .pattern-container {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .pattern-container .input {
+      flex: 1;
+    }
+
+    .pattern-preview {
+      margin-top: 12px;
+      padding: 12px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .preview-label {
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .preview-codes {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preview-code {
+      padding: 4px 8px;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 4px;
+      font-size: 11px;
+      font-family: monospace;
+      font-weight: 500;
+    }
+
+    .time-restrictions-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+    }
+
+    .time-restrictions {
+      margin-top: 15px;
+      padding: 15px;
+      background: var(--bg-secondary);
+      border-radius: 8px;
+      border: 1px solid var(--border-color);
+    }
+
+    .time-inputs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-bottom: 15px;
+    }
+
+    .time-inputs label {
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .time-inputs input[type="time"] {
+      flex: 1;
+    }
+
+    .day-selection {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .day-selection label {
+      font-weight: 500;
+      margin: 0;
+    }
+
+    .day-checkboxes {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .day-checkbox {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      cursor: pointer;
+      padding: 5px 8px;
+      border-radius: 4px;
+      transition: background-color 0.2s ease;
+    }
+
+    .day-checkbox:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .day-checkbox span {
+      font-size: 12px;
+      font-weight: 500;
+    }
+
+    .rewards-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .rewards-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .reward-item {
+      display: grid;
+      grid-template-columns: 120px 1fr 80px auto;
+      gap: 10px;
+      align-items: center;
+      padding: 12px;
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      position: relative;
+      z-index: 1;
+    }
+
+    #bulkRewardsList .reward-type {
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05) !important;
+      color: #ffffff !important;
+      font-size: 14px;
+      cursor: pointer;
+      position: relative;
+      z-index: 1000 !important;
+      pointer-events: auto !important;
+      appearance: none;
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      width: 100%;
+      min-width: 120px;
+    }
+    
+    #bulkRewardsList .reward-type:focus {
+      outline: none;
+      border-color: var(--primary-custom, #3b82f6) !important;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1) !important;
+    }
+    
+    #bulkRewardsList .reward-type option {
+      background: rgba(40, 40, 45, 0.98) !important;
+      color: #ffffff !important;
+      padding: 10px 12px !important;
+    }
+    
+    #bulkRewardsList .reward-type option:hover {
+      background: rgba(59, 130, 246, 0.4) !important;
+      color: #ffffff !important;
+    }
+    
+    #bulkRewardsList .reward-type option:checked,
+    #bulkRewardsList .reward-type option:focus {
+      background: rgba(59, 130, 246, 0.5) !important;
+      color: #ffffff !important;
+    }
+    
+    #bulkGenerateModal .modal-body,
+    #bulkGenerateModal .bulk-generate-content,
+    #bulkGenerateModal .rewards-list,
+    #bulkGenerateModal .reward-item {
+      pointer-events: auto !important;
+    }
+    
+    #bulkRewardsList .reward-item {
+      display: flex !important;
+      align-items: center !important;
+      gap: 12px !important;
+      flex-wrap: nowrap !important;
+      padding: 12px 14px !important;
+      background: rgba(255, 255, 255, 0.04) !important;
+      border: 1px solid rgba(255, 255, 255, 0.10) !important;
+      border-radius: 12px !important;
+      min-width: 0 !important;
+      overflow: visible !important;
+    }
+    
+    #bulkRewardsList .reward-type {
+      flex: 0 0 auto !important;
+      min-width: 120px !important;
+      max-width: 150px !important;
+    }
+    
+    #bulkRewardsList .reward-name {
+      flex: 1 1 auto !important;
+      min-width: 0 !important;
+      display: block !important;
+    }
+    
+    #bulkRewardsList .reward-name[style*="display: none"],
+    #bulkRewardsList .reward-name[style*="display:none"] {
+      display: none !important;
+      width: 0 !important;
+      min-width: 0 !important;
+      max-width: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      flex: 0 0 0 !important;
+    }
+    
+    #bulkRewardsList .reward-amount {
+      display: block !important;
+    }
+    
+    /* Money uses name field, so no special styling needed for amount */
+    
+    #bulkRewardsList .reward-item.reward-type-item .reward-amount {
+      flex: 0 0 auto !important;
+      min-width: 80px !important;
+      max-width: 120px !important;
+    }
+    
+    #bulkRewardsList .reward-amount[style*="display: none"],
+    #bulkRewardsList .reward-amount[style*="display:none"] {
+      display: none !important;
+      width: 0 !important;
+      min-width: 0 !important;
+      max-width: 0 !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      flex: 0 0 0 !important;
+    }
+    
+    #bulkRewardsList .remove-reward {
+      flex: 0 0 auto !important;
+      min-width: auto !important;
+      white-space: nowrap !important;
+      padding: 8px 12px !important;
+      margin: 0 !important;
+    }
+
+    .reward-name, .reward-amount {
+      padding: 8px 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.05) !important;
+      color: #ffffff !important;
+      font-size: 14px;
+      cursor: text;
+      position: relative;
+      z-index: 100;
+      pointer-events: auto !important;
+    }
+
+    .reward-name:focus, .reward-amount:focus {
+      outline: none;
+      border-color: var(--primary-custom, #3b82f6);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .reward-name::placeholder, .reward-amount::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .remove-reward {
+      padding: 8px 12px;
+      background: #f56565 !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .remove-reward:hover {
+      background: #e53e3e !important;
+    }
+
+    .remove-btn {
+      padding: 8px 12px;
+      background: #f56565 !important;
+      color: white !important;
+      border: none !important;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .remove-btn:hover {
+      background: #e53e3e !important;
+    }
+
+    .add-reward-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 20px;
+      background: var(--secondary-color);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      align-self: flex-start;
+    }
+
+    .add-reward-btn:hover {
+      background: #6c757d;
+    }
+
+    .add-reward-btn span {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .preview-section {
+      margin-top: 20px;
+    }
+
+    .preview-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .preview-card h4 {
+      margin: 0 0 15px 0;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .preview-details {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .preview-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .preview-item:last-child {
+      border-bottom: none;
+    }
+
+    .preview-item .label {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-secondary);
+      min-width: 120px;
+    }
+
+    .preview-item .value {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      text-align: right;
+      flex: 1;
+    }
+
+    .step-navigation {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .step-navigation .btn {
+      min-width: 100px;
+    }
+
+    .progress-section {
+      margin-top: 20px;
+      padding: 20px;
+      background: var(--bg-secondary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+    }
+
+    .progress-header h3 {
+      margin: 0 0 15px 0;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: var(--bg-primary);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary-color);
+      transition: width 0.3s ease;
+    }
+
+    .progress-info {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      color: var(--text-secondary);
+    }
+
+    .progress-status {
+      margin-top: 10px;
+      font-size: 14px;
+      color: var(--text-primary);
+      font-style: italic;
+    }
+
+    .help-modal .help-content {
+      background: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      max-width: 500px;
+      width: 90vw;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .help-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .help-header h3 {
+      margin: 0;
+      color: var(--text-primary);
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .help-close {
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-size: 20px;
+      cursor: pointer;
+      padding: 5px;
+      border-radius: 4px;
+      transition: background 0.2s ease;
+    }
+
+    .help-close:hover {
+      background: var(--bg-secondary);
+    }
+
+    .help-body {
+      padding: 20px;
+    }
+
+    .help-section {
+      margin-bottom: 20px;
+    }
+
+    .help-section:last-child {
+      margin-bottom: 0;
+    }
+
+    .help-section h4 {
+      margin: 0 0 10px 0;
+      color: var(--text-primary);
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .help-section ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .help-section li {
+      margin-bottom: 8px;
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .help-section code {
+      background: var(--bg-secondary);
+      color: var(--primary-color);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .step-nav {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      
+      .step {
+        padding: 8px 16px;
+        font-size: 12px;
+      }
+      
+      .reward-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      
+      .time-inputs {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+  
+  <script>
+    let currentStep = 1;
+    const totalSteps = 5;
+
+    function nextBulkStep() {
+      if (currentStep < totalSteps) {
+        currentStep++;
+        updateStepDisplay();
+        updatePreview();
+      }
+    }
+
+    function prevBulkStep() {
+      if (currentStep > 1) {
+        currentStep--;
+        updateStepDisplay();
+      }
+    }
+
+    function updateStepDisplay() {
+      const steps = document.querySelectorAll('.bulk-generate-modal .step');
+      
+      if (steps.length === 0) {
+        const allSteps = document.querySelectorAll('.step');
+        return;
+      }
+      
+      steps.forEach((step, index) => {
+        const stepNumber = index + 1;
+        step.classList.remove('active', 'completed');
+        
+        if (stepNumber <= currentStep) {
+          step.classList.add('active');
+        } else {
+        }
+      });
+
+      document.querySelectorAll('.bulk-generate-modal .step-content').forEach((content, index) => {
+        content.classList.toggle('active', index + 1 === currentStep);
+      });
+
+      const prevBtn = document.getElementById('prevStep');
+      const nextBtn = document.getElementById('nextStep');
+      const generateBtn = document.getElementById('bulkGenerateConfirm');
+
+      prevBtn.style.display = currentStep > 1 ? 'inline-block' : 'none';
+      nextBtn.style.display = currentStep < totalSteps ? 'inline-block' : 'none';
+      generateBtn.style.display = currentStep === totalSteps ? 'inline-block' : 'none';
+    }
+
+    function addRewardItem() {
+      const rewardsList = document.getElementById('bulkRewardsList');
+      const rewardItem = document.createElement('div');
+      rewardItem.className = 'reward-item';
+      rewardItem.innerHTML = `
+        <select class="reward-type" onchange="toggleRewardFields(this); updatePreview()">
+          <option value="item" data-locale="UI_WIZARD_REWARD_ITEM">Item</option>
+          <option value="money" data-locale="UI_WIZARD_REWARD_MONEY">Money</option>
+          <option value="vehicle" data-locale="UI_WIZARD_REWARD_VEHICLE">Vehicle</option>
+        </select>
+        <input type="text" class="reward-name" placeholder="Item name / Vehicle model" onchange="updatePreview()" data-locale-placeholder="UI_WIZARD_REWARD_NAME_PLACEHOLDER">
+        <input type="text" class="reward-label" placeholder="Display label (optional)" onchange="updatePreview()" style="display:none">
+        <input type="text" class="reward-amount" value="" placeholder="Amount" onchange="updatePreview()" data-locale-placeholder="UI_WIZARD_REWARD_AMOUNT_PLACEHOLDER">
+        <button type="button" class="btn btn-sm remove-reward" onclick="removeRewardItem(this); updatePreview()" data-locale="UI_REMOVE">Remove</button>
+      `;
+      rewardsList.appendChild(rewardItem);
+      
+      const selectElement = rewardItem.querySelector('.reward-type');
+      if (selectElement) {
+        setTimeout(() => {
+          toggleRewardFields(selectElement);
+        }, 0);
+      }
+    }
+
+    function removeRewardItem(button) {
+      const rewardItem = button.closest('.reward-item');
+      if (rewardItem) {
+        rewardItem.remove();
+      }
+    }
+
+    function toggleRewardFields(selectElement) {
+      if (!selectElement) return;
+      
+      const rewardItem = selectElement.closest('.reward-item');
+      if (!rewardItem) return;
+      
+      let nameInput = rewardItem.querySelector('.reward-name');
+      let labelInput = rewardItem.querySelector('.reward-label');
+      let amountInput = rewardItem.querySelector('.reward-amount');
+      const removeBtn = rewardItem.querySelector('.remove-reward');
+      
+      const selectedType = selectElement.value;
+      
+      const allOptions = selectElement.querySelectorAll('option');
+      allOptions.forEach(option => {
+        option.disabled = false;
+      });
+      
+      if (selectedType === 'money') {
+        // For money: use the name field (same position as item name/vehicle model) with "Amount" placeholder
+        // Hide the amount field completely
+        if (!nameInput) {
+          nameInput = document.createElement('input');
+          nameInput.type = 'text';
+          nameInput.className = 'reward-name';
+          nameInput.onchange = updatePreview;
+          const existingAmount = rewardItem.querySelector('.reward-amount');
+          if (existingAmount) {
+            existingAmount.parentNode.insertBefore(nameInput, existingAmount);
+          } else if (removeBtn) {
+            removeBtn.parentNode.insertBefore(nameInput, removeBtn);
+          } else {
+            rewardItem.appendChild(nameInput);
+          }
+        }
+        nameInput.style.display = '';
+        nameInput.placeholder = 'Amount'; // Use name field for money amount
+        
+        // Hide amount field for money
+        if (amountInput) {
+          amountInput.style.display = 'none';
+          amountInput.placeholder = '';
+        }
+        if (labelInput) labelInput.style.display = 'none';
+        
+        rewardItem.classList.remove('reward-type-item', 'reward-type-vehicle');
+        rewardItem.classList.add('reward-type-money');
+      } else if (selectedType === 'item') {
+        rewardItem.classList.remove('reward-type-money', 'reward-type-vehicle');
+        rewardItem.classList.add('reward-type-item');
+        
+        if (!nameInput) {
+          nameInput = document.createElement('input');
+          nameInput.type = 'text';
+          nameInput.className = 'reward-name';
+          nameInput.onchange = updatePreview;
+          const existingAmount = rewardItem.querySelector('.reward-amount');
+          if (existingAmount) {
+            existingAmount.parentNode.insertBefore(nameInput, existingAmount);
+          } else if (removeBtn) {
+            removeBtn.parentNode.insertBefore(nameInput, removeBtn);
+          } else {
+            rewardItem.appendChild(nameInput);
+          }
+        }
+        nameInput.style.display = '';
+        nameInput.placeholder = 'Item spawn name';
+        if (!labelInput) {
+          labelInput = document.createElement('input');
+          labelInput.type = 'text';
+          labelInput.className = 'reward-label';
+          labelInput.placeholder = 'Display label (e.g. Water Bottle)';
+          labelInput.onchange = updatePreview;
+          nameInput.insertAdjacentElement('afterend', labelInput);
+        }
+        labelInput.style.display = '';
+        
+        if (!amountInput) {
+          amountInput = document.createElement('input');
+          amountInput.type = 'text';
+          amountInput.className = 'reward-amount';
+          amountInput.value = '';
+          amountInput.onchange = updatePreview;
+          if (removeBtn) {
+            removeBtn.parentNode.insertBefore(amountInput, removeBtn);
+          } else {
+            rewardItem.appendChild(amountInput);
+          }
+        }
+        amountInput.type = 'text';
+        amountInput.style.display = '';
+        amountInput.placeholder = 'Amount';
+        if (labelInput) labelInput.style.display = 'none';
+      } else if (selectedType === 'vehicle') {
+        rewardItem.classList.remove('reward-type-money', 'reward-type-item');
+        rewardItem.classList.add('reward-type-vehicle');
+        
+        if (!nameInput) {
+          nameInput = document.createElement('input');
+          nameInput.type = 'text';
+          nameInput.className = 'reward-name';
+          nameInput.onchange = updatePreview;
+          const existingAmount = rewardItem.querySelector('.reward-amount');
+          if (existingAmount) {
+            existingAmount.parentNode.insertBefore(nameInput, existingAmount);
+          } else if (removeBtn) {
+            removeBtn.parentNode.insertBefore(nameInput, removeBtn);
+          } else {
+            rewardItem.appendChild(nameInput);
+          }
+        }
+        nameInput.style.display = '';
+        nameInput.placeholder = 'Vehicle model';
+        
+        if (amountInput) {
+          amountInput.style.display = 'none';
+          amountInput.placeholder = '';
+        }
+        if (labelInput) labelInput.style.display = 'none';
+      }
+    }
+
+    function toggleTimeRestrictions() {
+      const checkbox = document.getElementById('bulkTimeRestrictionsEnabled');
+      const timeRestrictionsRow = document.getElementById('timeRestrictionsRow');
+      
+      if (checkbox.checked) {
+        timeRestrictionsRow.style.display = 'block';
+      } else {
+        timeRestrictionsRow.style.display = 'none';
+      }
+      updatePreview();
+    }
+
+    function showPatternHelp() {
+      const helpModal = document.createElement('div');
+      helpModal.className = 'help-modal';
+      helpModal.innerHTML = `
+        <div class="help-content">
+          <div class="help-header">
+            <h3>Pattern Variables</h3>
+            <button class="help-close" onclick="this.closest('.help-modal').remove()"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="help-body">
+            <div class="help-section">
+              <h4>Available Variables:</h4>
+              <ul>
+                <li><code>{RANDOM:N}</code> - Random alphanumeric (N characters)</li>
+                <li><code>{NUMBER:N}</code> - Sequential numbers (N digits)</li>
+                <li><code>{DATE}</code> - Current date (YYYY-MM-DD)</li>
+                <li><code>{TIME}</code> - Current time (HH-MM)</li>
+                <li><code>{PREFIX:N}</code> - Random prefix (N characters)</li>
+                <li><code>{SUFFIX:N}</code> - Random suffix (N characters)</li>
+              </ul>
+            </div>
+            <div class="help-section">
+              <h4>Examples:</h4>
+              <ul>
+                <li><code>VIP-{RANDOM:6}</code> → VIP-ABC123</li>
+                <li><code>EVENT-{DATE}-{RANDOM:4}</code> → EVENT-20241207-XY9Z</li>
+                <li><code>REWARD-{NUMBER:4}</code> → REWARD-0001</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      helpModal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 99999;
+      `;
+      
+      document.body.appendChild(helpModal);
+      
+      helpModal.addEventListener('click', (e) => {
+        if (e.target === helpModal) {
+          helpModal.remove();
+        }
+      });
+    }
+
+    function updatePreview() {
+      document.getElementById('previewAmount').textContent = document.getElementById('bulkAmount').value || '100';
+      document.getElementById('previewPattern').textContent = document.getElementById('bulkPattern').value || 'CODE-{RANDOM:6}';
+      document.getElementById('previewUses').textContent = document.getElementById('bulkUses').value || '1';
+      document.getElementById('previewPerUser').textContent = document.getElementById('bulkPerUser').value || '1';
+
+      const expiryInput = document.getElementById('bulkExpiry');
+      if (expiryInput && expiryInput.value) {
+        const expiryDate = new Date(expiryInput.value);
+        document.getElementById('previewExpiry').textContent = expiryDate.toLocaleString();
+      } else {
+        document.getElementById('previewExpiry').textContent = 'Never';
+      }
+
+      const timeEnabled = document.getElementById('bulkTimeRestrictionsEnabled').checked;
+      if (timeEnabled) {
+        const startTime = document.getElementById('bulkStartTime').value;
+        const endTime = document.getElementById('bulkEndTime').value;
+        const selectedDays = Array.from(document.querySelectorAll('#timeRestrictionsRow input[type="checkbox"]:checked'))
+          .map(cb => cb.value.charAt(0).toUpperCase() + cb.value.slice(1));
+        document.getElementById('previewTimeRestrictions').textContent = 
+          `${startTime} - ${endTime} (${selectedDays.join(', ')})`;
+      } else {
+        document.getElementById('previewTimeRestrictions').textContent = 'None';
+      }
+
+      const rewards = collectRewards();
+      if (rewards.length > 0) {
+        const rewardsHtml = rewards.map(reward => {
+          if (reward.money) return `<i class='fas fa-dollar-sign'></i> $${reward.amount || 1}`;
+          if (reward.item) return `<i class='fas fa-box'></i> ${reward.amount || 1}x ${reward.item}`;
+          if (reward.vehicle) return `<i class='fas fa-car'></i> ${reward.model}`;
+          return '';
+        }).join('<br>');
+        document.getElementById('previewRewards').innerHTML = rewardsHtml;
+      } else {
+        document.getElementById('previewRewards').textContent = 'None';
+      }
+
+      updatePatternPreview();
+    }
+
+    function updatePatternPreview() {
+      const pattern = document.getElementById('bulkPattern').value || 'CODE-{RANDOM:6}';
+      const previewCodes = document.querySelectorAll('#bulkPatternPreview .preview-code');
+      
+      const samples = [];
+      for (let i = 0; i < 3; i++) {
+        let sample = pattern;
+        sample = sample.replace(/{RANDOM:(\d+)}/g, (match, length) => {
+          return Math.random().toString(36).substring(2, 2 + parseInt(length)).toUpperCase();
+        });
+        sample = sample.replace(/{NUMBER:(\d+)}/g, (match, length) => {
+          return String(i + 1).padStart(parseInt(length), '0');
+        });
+        sample = sample.replace(/{DATE}/g, new Date().toISOString().split('T')[0].replace(/-/g, ''));
+        sample = sample.replace(/{TIME}/g, new Date().toTimeString().slice(0, 5).replace(':', ''));
+        samples.push(sample);
+      }
+      
+      previewCodes.forEach((code, index) => {
+        code.textContent = samples[index] || 'CODE-ABC123';
+      });
+    }
+
+    function collectRewards() {
+      const rewardItems = document.querySelectorAll('#bulkRewardsList .reward-item');
+      const rewards = [];
+      
+      rewardItems.forEach((item, index) => {
+        const typeSelect = item.querySelector('.reward-type');
+        if (!typeSelect) return;
+        
+        const type = typeSelect.value;
+        const nameInput = item.querySelector('.reward-name');
+        const amountInput = item.querySelector('.reward-amount');
+        
+        const name = (nameInput && nameInput.style.display !== 'none') ? nameInput.value : '';
+        
+        let amount = 1;
+        if (amountInput && amountInput.style.display !== 'none') {
+          const amountValue = parseFloat(amountInput.value);
+          if (!isNaN(amountValue) && amountValue > 0) {
+            amount = amountValue;
+          }
+        }
+        
+        if (type === 'money') {
+          // For money, read from name field (which has placeholder "Amount")
+          const moneyAmount = parseFloat(name);
+          if (!isNaN(moneyAmount) && moneyAmount > 0) {
+            rewards.push({ money: true, amount: moneyAmount, option: 'cash' });
+          }
+        } else if (type === 'item' && name.trim()) {
+          const reward = { item: name.trim(), amount: amount };
+          const labelInput = item.querySelector('.reward-label');
+          const label = labelInput && labelInput.style.display !== 'none' ? labelInput.value.trim() : '';
+          if (label) reward.label = label;
+          rewards.push(reward);
+        } else if (type === 'vehicle' && name.trim()) {
+          rewards.push({ vehicle: true, model: name.trim() });
+        }
+      });
+      
+      return rewards;
+    }
+
+    function collectTimeRestrictions() {
+      const enabled = document.getElementById('bulkTimeRestrictionsEnabled').checked;
+      if (!enabled) return null;
+      
+      const startTime = document.getElementById('bulkStartTime').value;
+      const endTime = document.getElementById('bulkEndTime').value;
+      const selectedDays = Array.from(document.querySelectorAll('#timeRestrictionsRow input[type="checkbox"]:checked'))
+        .map(cb => cb.value);
+      
+      return { enabled: true, startTime, endTime, days: selectedDays };
+    }
+
+    function submitBulkGeneration() {
+      console.log("Submitting bulk generation...");
+      
+      const rewards = collectRewards();
+      const validRewards = rewards.filter(reward => {
+        if (reward.money) return true;
+        if (reward.item && reward.item.trim()) return true;
+        if (reward.vehicle && reward.model && reward.model.trim()) return true;
+        return false;
+      });
+      
+      if (validRewards.length === 0) {
+        alert("Please add at least one valid reward before generating codes.");
+        return;
+      }
+      
+      console.log("Validation passed - proceeding with generation");
+      
+      if (typeof window.generateBulkCodes === 'function') {
+        console.log("Using app.js generateBulkCodes function");
+        window.generateBulkCodes();
+      } else {
+        console.log("App.js generateBulkCodes not found, using fallback");
+        alert("Bulk generation function not available. Please refresh the page.");
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      currentStep = 1;
+      updateStepDisplay();
+      updatePreview();
+      
+      const customCodeInput = document.getElementById('mCustomCode');
+      if (customCodeInput) {
+        fetch(`https://${GetParentResourceName()}/getServerConfig`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        }).then(resp => resp.json()).then(config => {
+          const minLength = config.minCustomChar || 6;
+          
+          const safeT = typeof window !== 'undefined' && typeof window.t === 'function' ? window.t : (key) => key;
+          
+          customCodeInput.placeholder = safeT('UI_PLACEHOLDER_MIN_CHARS').replace('%s', minLength);
+          customCodeInput.setAttribute('minlength', minLength);
+          
+          customCodeInput._validationHandler = function() {
+            const value = this.value;
+            
+            if (value.length > 0 && value.length < minLength) {
+              this.setCustomValidity(safeT('UI_VALIDATION_MIN_CHARS').replace('%s', minLength));
+              this.style.borderColor = '#dc3545';
+            } else {
+              this.setCustomValidity('');
+              this.style.borderColor = '';
+            }
+          };
+          
+          customCodeInput.addEventListener('input', customCodeInput._validationHandler);
+          customCodeInput.addEventListener('blur', customCodeInput._validationHandler);
+        }).catch(error => {
+          const minLength = 6;
+          
+          const safeT = typeof window !== 'undefined' && typeof window.t === 'function' ? window.t : (key) => key;
+          
+          customCodeInput.placeholder = safeT('UI_PLACEHOLDER_MIN_CHARS').replace('%s', minLength);
+          customCodeInput.setAttribute('minlength', minLength);
+          
+          customCodeInput._validationHandler = function() {
+            const value = this.value;
+            if (value.length > 0 && value.length < minLength) {
+              this.setCustomValidity(safeT('UI_VALIDATION_MIN_CHARS').replace('%s', minLength));
+              this.style.borderColor = '#dc3545';
+            } else {
+              this.setCustomValidity('');
+              this.style.borderColor = '';
+            }
+          };
+          
+          customCodeInput.addEventListener('input', customCodeInput._validationHandler);
+          customCodeInput.addEventListener('blur', customCodeInput._validationHandler);
+        });
+      }
+      
+      const wizardCustomCodeInput = document.getElementById('wizardCustomCode');
+      if (wizardCustomCodeInput) {
+        fetch(`https://${GetParentResourceName()}/getServerConfig`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({})
+        }).then(resp => resp.json()).then(config => {
+          const minLength = config.minCustomChar || 6;
+          
+          const safeT = typeof window !== 'undefined' && typeof window.t === 'function' ? window.t : (key) => key;
+          
+          wizardCustomCodeInput.placeholder = safeT('UI_PLACEHOLDER_MIN_CHARS').replace('%s', minLength);
+          wizardCustomCodeInput.setAttribute('minlength', minLength);
+          const helpText = wizardCustomCodeInput.nextElementSibling;
+          if (helpText && helpText.classList.contains('input-help')) {
+            helpText.textContent = safeT('UI_HELP_MIN_MAX_CHARS').replace('%s', minLength);
+          }
+          
+          const initialPlaceholder = safeT('UI_WIZARD_CUSTOM_CODE_PLACEHOLDER');
+          if (initialPlaceholder && initialPlaceholder !== 'UI_WIZARD_CUSTOM_CODE_PLACEHOLDER') {
+            wizardCustomCodeInput.placeholder = initialPlaceholder;
+          }
+          if (helpText && helpText.classList.contains('input-help')) {
+            const initialHelp = safeT('UI_WIZARD_CUSTOM_CODE_HELP');
+            if (initialHelp && initialHelp !== 'UI_WIZARD_CUSTOM_CODE_HELP' && initialHelp !== 'Loading...') {
+              helpText.textContent = initialHelp;
+            }
+          }
+          
+          wizardCustomCodeInput._validationHandler = function() {
+            const value = this.value;
+            if (value.length === 0 || (value.length > 0 && value.length < minLength)) {
+              this.setCustomValidity(safeT('UI_VALIDATION_MIN_CHARS').replace('%s', minLength));
+              this.classList.add('error');
+              this.classList.remove('valid');
+            } else {
+              this.setCustomValidity('');
+              this.classList.add('valid');
+              this.classList.remove('error');
+            }
+          };
+          
+          wizardCustomCodeInput._minLength = minLength;
+          
+          wizardCustomCodeInput.addEventListener('input', wizardCustomCodeInput._validationHandler);
+          wizardCustomCodeInput.addEventListener('blur', wizardCustomCodeInput._validationHandler);
+          
+          wizardCustomCodeInput._validationHandler.call(wizardCustomCodeInput);
+        }).catch(error => {
+          const minLength = 6;
+          
+          const safeT = typeof window !== 'undefined' && typeof window.t === 'function' ? window.t : (key) => key;
+          
+          wizardCustomCodeInput.placeholder = safeT('UI_PLACEHOLDER_MIN_CHARS').replace('%s', minLength);
+          wizardCustomCodeInput.setAttribute('minlength', minLength);
+          const helpText = wizardCustomCodeInput.nextElementSibling;
+          if (helpText && helpText.classList.contains('input-help')) {
+            helpText.textContent = safeT('UI_HELP_MIN_MAX_CHARS').replace('%s', minLength);
+          }
+          
+          const initialPlaceholder = safeT('UI_WIZARD_CUSTOM_CODE_PLACEHOLDER');
+          if (initialPlaceholder && initialPlaceholder !== 'UI_WIZARD_CUSTOM_CODE_PLACEHOLDER') {
+            wizardCustomCodeInput.placeholder = initialPlaceholder;
+          }
+          if (helpText && helpText.classList.contains('input-help')) {
+            const initialHelp = safeT('UI_WIZARD_CUSTOM_CODE_HELP');
+            if (initialHelp && initialHelp !== 'UI_WIZARD_CUSTOM_CODE_HELP' && initialHelp !== 'Loading...') {
+              helpText.textContent = initialHelp;
+            }
+          }
+          
+          wizardCustomCodeInput._validationHandler = function() {
+            const value = this.value;
+            if (value.length === 0 || (value.length > 0 && value.length < minLength)) {
+              this.setCustomValidity(safeT('UI_VALIDATION_MIN_CHARS').replace('%s', minLength));
+              this.classList.add('error');
+              this.classList.remove('valid');
+            } else {
+              this.setCustomValidity('');
+              this.classList.add('valid');
+              this.classList.remove('error');
+            }
+          };
+          
+          wizardCustomCodeInput.addEventListener('input', wizardCustomCodeInput._validationHandler);
+          wizardCustomCodeInput.addEventListener('blur', wizardCustomCodeInput._validationHandler);
+          
+          wizardCustomCodeInput._validationHandler.call(wizardCustomCodeInput);
+        });
+      }
+    });
+
+    window.showCustomNotification = function(title, message, type = 'error') {
+      const existing = document.querySelector('.custom-notification');
+      if (existing) existing.remove();
+      
+      const notification = document.createElement('div');
+      notification.className = 'custom-notification';
+      notification.innerHTML = `
+        <div class="custom-notification-content">
+          <div class="custom-notification-icon">${type === 'error' ? '<i class="fas fa-exclamation-triangle"></i>' : '<i class="fas fa-check"></i>'}</div>
+          <div class="custom-notification-text">
+            <div class="custom-notification-title">${title}</div>
+            <div class="custom-notification-message">${message}</div>
+          </div>
+          <button class="custom-notification-close" onclick="this.parentElement.parentElement.remove()"><i class="fas fa-times"></i></button>
+        </div>
+      `;
+      
+      notification.style.cssText = `
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        z-index: 10000;
+        background: ${type === 'error' ? '#dc3545' : '#28a745'};
+        color: white;
+        border-radius: 12px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        min-width: 300px;
+        max-width: 400px;
+        animation: slideInRight 0.3s ease-out;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      `;
+      
+      const style = document.createElement('style');
+      style.textContent = `
+        @keyframes slideInRight {
+          from { transform: translateX(100%); opacity: 0; }
+          to { transform: translateX(0); opacity: 1; }
+        }
+        .custom-notification-content {
+          display: flex;
+          align-items: center;
+          padding: 16px 20px;
+          gap: 12px;
+        }
+        .custom-notification-icon {
+          font-size: 20px;
+          flex-shrink: 0;
+        }
+        .custom-notification-text {
+          flex: 1;
+        }
+        .custom-notification-title {
+          font-weight: 600;
+          font-size: 14px;
+          margin-bottom: 4px;
+        }
+        .custom-notification-message {
+          font-size: 13px;
+          opacity: 0.9;
+          line-height: 1.4;
+        }
+        .custom-notification-close {
+          background: none;
+          border: none;
+          color: white;
+          font-size: 18px;
+          cursor: pointer;
+          padding: 4px;
+          border-radius: 4px;
+          transition: background-color 0.2s;
+          flex-shrink: 0;
+        }
+        .custom-notification-close:hover {
+          background: rgba(255, 255, 255, 0.2);
+        }
+      `;
+      document.head.appendChild(style);
+      
+      const appContainer = document.getElementById('app');
+      if (appContainer) {
+        appContainer.appendChild(notification);
+      } else {
+        document.body.appendChild(notification);
+      }
+      
+      setTimeout(() => {
+        if (notification.parentElement) {
+          notification.style.animation = 'slideInRight 0.3s ease-out reverse';
+          setTimeout(() => notification.remove(), 300);
+        }
+      }, 5000);
+    };
+
+    window.validateWizardCustomCode = function() {
+      const wizardCustomCodeInput = document.getElementById('wizardCustomCode');
+      if (!wizardCustomCodeInput) return true;
+      
+      const value = wizardCustomCodeInput.value.trim();
+      const minLength = wizardCustomCodeInput._minLength || 6;
+      
+      if (value.length > 0 && value.length < minLength) {
+        return false;
+      }
+      
+      return true;
+    };
+
+    window.wizardNextStepOverride = function() {
+      const wizardCustomCodeInput = document.getElementById('wizardCustomCode');
+      if (wizardCustomCodeInput && wizardCustomCodeInput.value.trim()) {
+        const customCodeValid = window.validateWizardCustomCode();
+        if (!customCodeValid) {
+          if (window.toast) {
+            const minLength = wizardCustomCodeInput._minLength || 6;
+            window.toast('Validation Error', 'Code must be at least ' + minLength + ' characters long', 'error');
+          }
+          return false;
+        }
+      }
+      
+      if (window.wizardNextStep) {
+        return window.wizardNextStep();
+      }
+      return true;
+    };
+
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        if (window.validateWizardStep) {
+          const originalValidateWizardStep = window.validateWizardStep;
+          window.validateWizardStep = function(step) {
+            const result = originalValidateWizardStep(step);
+            
+            if (step === 1 && result) {
+              const customCodeValid = window.validateWizardCustomCode();
+              if (!customCodeValid) {
+                const minLength = document.getElementById('wizardCustomCode')?._minLength || 6;
+                const errorMessage = 'Code must be at least ' + minLength + ' characters long';
+                window.showCustomNotification('Validation Error', errorMessage, 'error');
+                return false;
+              }
+            }
+            
+            return result;
+          };
+        } else {
+          setTimeout(function() {
+            if (window.validateWizardStep) {
+              const originalValidateWizardStep = window.validateWizardStep;
+              window.validateWizardStep = function(step) {
+                const result = originalValidateWizardStep(step);
+                
+                if (step === 1 && result) {
+                  const customCodeValid = window.validateWizardCustomCode();
+                  if (!customCodeValid) {
+                    const minLength = document.getElementById('wizardCustomCode')?._minLength || 6;
+                    const errorMessage = 'Code must be at least ' + minLength + ' characters long';
+                    window.showCustomNotification('Validation Error', errorMessage, 'error');
+                    return false;
+                  }
+                }
+                
+                return result;
+              };
+            }
+          }, 2000);
+        }
+      }, 1000);
+      
+    });
+
+    function initializeBulkModal() {
+      currentStep = 1;
+      updateStepDisplay();
+      updatePreview();
+    }
+
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.id === 'bulkGenerateBtn') {
+        setTimeout(initializeBulkModal, 100);
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.textContent && e.target.textContent.includes('Bulk Generate')) {
+        setTimeout(initializeBulkModal, 100);
+      }
+    });
+
+    document.addEventListener('click', function(e) {
+      if (e.target && e.target.closest && e.target.closest('#bulkGenerateModal')) {
+        if (currentStep === 1) {
+          updateStepDisplay();
+        }
+      }
+    });
+
+    const modal = document.getElementById('bulkGenerateModal');
+    if (modal) {
+      const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'attributes' && mutation.attributeName === 'class') {
+            if (!modal.classList.contains('hidden')) {
+              setTimeout(initializeBulkModal, 50);
+            }
+          }
+        });
+      });
+      observer.observe(modal, { attributes: true, attributeFilter: ['class'] });
+    }
+
+    window.testBulkSteps = function() {
+      currentStep = 1;
+      updateStepDisplay();
+      
+      setTimeout(() => {
+        currentStep = 2;
+        updateStepDisplay();
+      }, 2000);
+      
+      setTimeout(() => {
+        currentStep = 3;
+        updateStepDisplay();
+      }, 4000);
+    };
+
+    window.forceStepColors = function() {
+      const steps = document.querySelectorAll('.bulk-generate-modal .step');
+      
+      steps.forEach((step, index) => {
+        step.classList.remove('active', 'completed');
+        if (index < 3) {
+          step.classList.add('active');
+        }
+      });
+    };
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      const allRewardSelects = document.querySelectorAll('.reward-type');
+      allRewardSelects.forEach(select => {
+        toggleRewardFields(select);
+      });
+    });
+  </script>
+</body>
+</html>
