@@ -2336,6 +2336,13 @@ lib.callback.register("midnight-redeem:getAllCodesWithDetails", function(source)
     return _dashboardData.codes or getAllCodesWithDetails()
 end)
 
+lib.callback.register("midnight-redeem:getAllCodesForSearch", function(source)
+    if not requireAdmin(source, "VIEW_DASHBOARD") then
+        return {}
+    end
+    return _dashboardData.allCodes or getAllCodesForSearch()
+end)
+
 RegisterServerEvent("midnight-redeem:adminCheckCode", function(code)
     local src = source
     if not requireAdmin(src, "VIEW_DASHBOARD") then return end

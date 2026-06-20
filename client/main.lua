@@ -257,6 +257,14 @@ RegisterNUICallback('getAllCodesWithDetails', function(_, cb)
     if cb then cb(result) end
 end)
 
+RegisterNUICallback('getAllCodesForSearch', function(_, cb)
+    local ok, result = pcall(function()
+        return lib.callback.await("midnight-redeem:getAllCodesForSearch", false)
+    end)
+    if not ok then result = {} end
+    if cb then cb(result or {}) end
+end)
+
 
 
 RegisterNUICallback('getAllUserPermissions', function(_, cb)
