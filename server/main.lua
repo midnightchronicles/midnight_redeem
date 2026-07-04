@@ -3501,6 +3501,9 @@ end)
 RegisterNetEvent("midnight-redeem:registerAdminClient", function()
     if requireAdmin(source, "VIEW_DASHBOARD") then
         registerAdminClient(source)
+        if RuntimeConfig and RuntimeConfig.syncToClient then
+            RuntimeConfig.syncToClient(source)
+        end
     end
 end)
 

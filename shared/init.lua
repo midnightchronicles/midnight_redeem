@@ -16,6 +16,8 @@ function GetFrameworkVersion()
     return Bridge.Framework.GetFrameworkName() or "unknown"
 end
 
+Config.mincustomchar = Config.mincustomchar or 6
+
 
 
 function GenerateSQLTables()

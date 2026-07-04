@@ -1056,6 +1056,22 @@ function RuntimeConfig.applyOverrides(stored)
     RuntimeConfig.rebuildContentFilter()
 end
 
+function RuntimeConfig.getClientSyncPayload()
+    return {
+        mincustomchar = tonumber(Config.mincustomchar) or 6,
+        aiEnabled = Config.AIEnabled ~= false,
+    }
+end
+
+function RuntimeConfig.syncToClient(target)
+    local payload = RuntimeConfig.getClientSyncPayload()
+    if type(target) == "number" and target > 0 then
+        TriggerClientEvent("midnight-redeem:syncClientConfig", target, payload)
+    else
+        TriggerClientEvent("midnight-redeem:syncClientConfig", -1, payload)
+    end
+end
+
 function RuntimeConfig.getSection(section)
     local stored = loadOrSeedConfig(false)
     return deepCopy(stored[section] or {})
@@ -1083,6 +1099,7 @@ function RuntimeConfig.saveSection(source, section, payload)
     stored[section] = payload
     persistConfig(stored)
     RuntimeConfig.applyOverrides(stored)
+    RuntimeConfig.syncToClient(-1)
 
     if SendToDiscord then
         SendToDiscord(
@@ -1106,6 +1123,7 @@ function RuntimeConfig.resetSection(source, section)
     stored[section] = deepCopy(defaults[section] or {})
     persistConfig(stored)
     RuntimeConfig.applyOverrides(stored)
+    RuntimeConfig.syncToClient(-1)
     return true, RuntimeConfig.getSection(section)
 end
 
@@ -1266,7 +1284,16 @@ function RuntimeConfig.init()
         storedConfigCache = storedConfigCache or getDefaultSnapshot()
         RuntimeConfig.applyOverrides(storedConfigCache)
     end
+
+    RuntimeConfig.syncToClient(-1)
 end
+
+RegisterNetEvent("midnight-redeem:requestClientConfig", function()
+    local src = source
+    if not src or src <= 0 then return end
+    RuntimeConfig.init()
+    RuntimeConfig.syncToClient(src)
+end)
 
 AddEventHandler("onResourceStart", function(resource)
     if resource ~= GetCurrentResourceName() then return end

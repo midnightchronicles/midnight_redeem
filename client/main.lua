@@ -41,6 +41,15 @@ end)
 AddEventHandler('onClientResourceStart', function(res)
     if res ~= GetCurrentResourceName() then return end
     closeUI()
+    TriggerServerEvent("midnight-redeem:requestClientConfig")
+end)
+
+RegisterNetEvent("midnight-redeem:syncClientConfig", function(payload)
+    payload = payload or {}
+    Config.mincustomchar = tonumber(payload.mincustomchar) or Config.mincustomchar or 6
+    if payload.aiEnabled ~= nil then
+        Config.AIEnabled = payload.aiEnabled == true
+    end
 end)
 
 RegisterNetEvent('midnight_redeem:ui:open', function(payload)
@@ -116,8 +125,9 @@ RegisterNUICallback('adminCreate', function(data, cb)
     local timeRestrictions = data.timeRestrictions
     local playerRestriction = data.playerRestriction
     
-    if customCode and customCode ~= "" and #customCode < Config.mincustomchar then
-        NotificationUser("Create Code", "Code must be at least " .. Config.mincustomchar .. " characters long.", "error")
+    local minCustomChar = tonumber(Config.mincustomchar) or 6
+    if customCode and customCode ~= "" and #customCode < minCustomChar then
+        NotificationUser("Create Code", "Code must be at least " .. minCustomChar .. " characters long.", "error")
         if cb then cb(false) end
         return
     end
@@ -539,7 +549,7 @@ RegisterNUICallback('getServerConfig', function(_, cb)
     end)
 
     local config = {
-        minCustomChar = Config.mincustomchar or 8,
+        minCustomChar = tonumber(Config.mincustomchar) or 6,
         aiEnabled = aiEnabled,
         version = versionInfo,
     }
