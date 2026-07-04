@@ -4,7 +4,7 @@ lua54 'yes'
 
 ui_page 'html/index.html'
 
-version '2.0.1'
+version '2.0.2'
 description 'Redeem System'
 author 'Midnight Chronicles'
 
